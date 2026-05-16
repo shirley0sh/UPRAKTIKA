@@ -4,14 +4,58 @@
     <meta charset="UTF-8">
     <title>Graph Editor - Floyd-Warshall</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Локальные стили для шапки редактора */
+        .toolbar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-2px);
+            border-color: #fff;
+        }
+        .toolbar-title {
+            color: #2c2c2c;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="toolbar">
-            <div class="nav-buttons">
-                <a href="/" class="nav-btn">← Back to Home</a>
+            <!-- Шапка с кнопкой назад и заголовком -->
+            <div class="toolbar-header">
+                <a href="/" class="back-btn" title="Back to Home"><</a>
+                <h3 class="toolbar-title">Floyd-Warshall Algorithm</h3>
             </div>
-            <h3>Floyd-Warshall Algorithm</h3>
 
             <div id="point-drag" class="draggable-point" draggable="true">+ Add Point</div>
 
