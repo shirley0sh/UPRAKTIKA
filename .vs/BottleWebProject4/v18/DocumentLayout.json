@@ -7,12 +7,20 @@
       "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\views\\index.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\prim.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\views\\prim.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\scripts\\prim.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\static\\scripts\\prim.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 8,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,13 +54,39 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "prim.js",
+              "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\scripts\\prim.js",
+              "RelativeDocumentMoniker": "BottleWebProject4\\static\\scripts\\prim.js",
+              "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\scripts\\prim.js",
+              "RelativeToolTip": "BottleWebProject4\\static\\scripts\\prim.js",
+              "ViewState": "AgIAACkBAAAAAAAAAAAiwEUBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-05-16T11:08:36.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "prim.tpl",
+              "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\prim.tpl",
+              "RelativeDocumentMoniker": "BottleWebProject4\\views\\prim.tpl",
+              "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\prim.tpl",
+              "RelativeToolTip": "BottleWebProject4\\views\\prim.tpl",
+              "ViewState": "AgIAAJAAAAAAAAAAAAAkwIwAAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-05-16T11:02:31.61Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "style.css",
               "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css",
               "RelativeDocumentMoniker": "BottleWebProject4\\static\\style.css",
               "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css",
               "RelativeToolTip": "BottleWebProject4\\static\\style.css",
-              "ViewState": "AgIAAJkBAAAAAAAAAAAAAKsBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAKsBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2026-05-16T10:15:41.216Z",
               "EditorCaption": ""
@@ -65,22 +99,23 @@
               "RelativeDocumentMoniker": "BottleWebProject4\\views\\index.tpl",
               "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl",
               "RelativeToolTip": "BottleWebProject4\\views\\index.tpl",
-              "ViewState": "AgIAAGABAAAAAAAAAAAIwHYBAABTAAAAAAAAAA==",
+              "ViewState": "AgIAAPwCAAAAAAAAAAAIwA4DAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-05-16T10:05:36.241Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "app.py",
               "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py",
               "RelativeDocumentMoniker": "BottleWebProject4\\app.py",
               "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py",
               "RelativeToolTip": "BottleWebProject4\\app.py",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIQAAAAAAAAAAAAkwJkAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
-              "WhenOpened": "2026-05-16T10:03:43.792Z"
+              "WhenOpened": "2026-05-16T10:03:43.792Z",
+              "EditorCaption": ""
             }
           ]
         }
