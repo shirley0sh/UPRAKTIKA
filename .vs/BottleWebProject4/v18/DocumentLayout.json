@@ -1,0 +1,74 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\views\\index.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "index.tpl",
+              "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl",
+              "RelativeDocumentMoniker": "BottleWebProject4\\views\\index.tpl",
+              "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl",
+              "RelativeToolTip": "BottleWebProject4\\views\\index.tpl",
+              "ViewState": "AgIAADoCAAAAAAAAAAAAAEcCAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-05-16T10:05:36.241Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "app.py",
+              "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py",
+              "RelativeDocumentMoniker": "BottleWebProject4\\app.py",
+              "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py",
+              "RelativeToolTip": "BottleWebProject4\\app.py",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2026-05-16T10:03:43.792Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
