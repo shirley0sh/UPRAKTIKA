@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Graph Editor - Dijkstra</title>
+    <title>Graph Editor - Dijkstra | Интерактивный граф ↔ Матрица</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
+        /* Сохранение всех исходных стилей */
         .nav-buttons {
             display: flex;
             gap: 10px;
@@ -194,6 +195,91 @@
             color: #e74c3c;
             font-style: italic;
         }
+        /* Дополнительные стили для canvas и точек */
+        .canvas {
+            position: relative;
+            background: #f8f9fc;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            min-height: 450px;
+            height: 500px;
+        }
+        .lines-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .points-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+        .graph-point {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            background: #5a4d5e;
+            border: 3px solid #f4d58c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            cursor: grab;
+            transition: 0.05s linear;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 20;
+            font-family: monospace;
+        }
+        .graph-point:active {
+            cursor: grabbing;
+        }
+        .edge-weight-label {
+            position: absolute;
+            background: rgba(0,0,0,0.7);
+            color: #ffec82;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            font-family: monospace;
+            z-index: 15;
+            backdrop-filter: blur(4px);
+            transform: translate(-50%, -50%);
+        }
+        .container {
+            display: flex;
+            gap: 24px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .toolbar {
+            flex: 1.2;
+            background: rgba(255,255,240,0.7);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(2px);
+        }
+        .canvas {
+            flex: 2;
+        }
+        @media (max-width: 800px) {
+            .container { flex-direction: column; }
+        }
     </style>
 </head>
 <body>
@@ -206,24 +292,20 @@
             </div>
             <h3>Dijkstra Algorithm</h3>
 
-            <!-- Секция ввода данных -->
             <div class="input-section">
                 <h4>Input Data</h4>
                 <div class="form-group">
                     <label for="vertex-count">Number of vertices (2-10):</label>
-                    <input type="number" id="vertex-count" min="2" max="10" value="3" />
+                    <input type="number" id="vertex-count" min="2" max="10" value="4" />
                 </div>
-                <button class="btn-generate" id="generate-matrix-btn">Generate Matrix</button>
-
+                <button class="btn-generate" id="generate-matrix-btn">Generate Matrix & Graph</button>
                 <div class="matrix-container" id="matrix-container" style="display: none;">
-                    <label style="display: block; margin: 10px 0 5px 0; font-weight: bold; color: #34495e;">Weight Matrix:</label>
-                    <table class="matrix-table" id="weight-matrix">
-                        <!-- Таблица будет генерироваться динамически -->
-                    </table>
+                    <label style="display: block; margin: 10px 0 5px 0; font-weight: bold; color: #34495e;">Weight Matrix (неориентированный граф):</label>
+                    <table class="matrix-table" id="weight-matrix"></table>
+                    <div style="font-size: 11px; margin-top: 6px; text-align: center;">Изменяйте ячейки → граф обновляется | Перетащите вершины → матрица меняется</div>
                 </div>
             </div>
 
-            <!-- Секция выбора стартовой вершины -->
             <div class="start-vertex-section" id="start-vertex-section" style="display: none;">
                 <h4>Start Vertex</h4>
                 <select class="start-vertex-select" id="start-vertex-select">
@@ -232,326 +314,475 @@
                 <button class="btn-generate" id="calculate-btn">Calculate Shortest Paths</button>
             </div>
 
-            <!-- Сообщение об ошибке -->
             <div class="error-message" id="error-message"></div>
 
-            <!-- Секция результатов -->
             <div class="results-section" id="results-section">
                 <h4>Results</h4>
                 <label style="display: block; margin: 10px 0 5px 0; font-weight: bold; color: #34495e;">Shortest Distances:</label>
                 <table class="results-table" id="distances-table">
-                    <thead>
-                        <tr>
-                            <th>Vertex</th>
-                            <th>Distance from Start</th>
-                        </tr>
-                    </thead>
-                    <tbody id="distances-tbody">
-                        <!-- Результаты будут добавлены динамически -->
-                    </tbody>
+                    <thead><tr><th>Vertex</th><th>Distance from Start</th></tr></thead>
+                    <tbody id="distances-tbody"></tbody>
                 </table>
-
                 <label style="display: block; margin: 15px 0 5px 0; font-weight: bold; color: #34495e;">Shortest Paths:</label>
-                <div class="path-list" id="path-list">
-                    <!-- Пути будут добавлены динамически -->
-                </div>
+                <div class="path-list" id="path-list"></div>
             </div>
-
-            <div id="point-drag" class="draggable-point" draggable="true">Add Point</div>
-            <div id="buttons-container"></div>
-            <select id="source-select" class="source-select">
-                <option value="">Select source vertex</option>
-            </select>
-            <button id="dijkstra-btn" class="btn algorithm-btn">Compute Shortest Paths</button>
-            <div id="results" style="margin-top: 15px; max-height: 300px; overflow-y: auto;"></div>
         </div>
         <div id="canvas" class="canvas">
             <svg id="lines-layer" class="lines-layer"></svg>
             <div id="points-layer" class="points-layer"></div>
         </div>
     </div>
-    <script src="/static/script.js"></script>
-    <script src="/static/dijkstra.js"></script>
+
     <script>
-        // Генерация матрицы весов
-        document.getElementById('generate-matrix-btn').addEventListener('click', function() {
-            const n = parseInt(document.getElementById('vertex-count').value);
+        // ======================== ПОЛНОСТЬЮ ЛОКАЛЬНЫЙ ГРАФ (БЕЗ СЕРВЕРА) ========================
+        let verticesData = [];     // { id: number, x, y, dom, labelIndex }
+        let edgesList = [];        // { fromId, toId, weight }
+        let currentN = 4;
+        let syncingFromMatrix = false;
+        let syncingFromCanvas = false;
+        let nextVertexId = 1;
 
-            if (isNaN(n) || n < 2 || n > 10) {
-                alert('Please enter a valid number of vertices (2-10)');
-                return;
+        // DOM элементы
+        const canvasDiv = document.getElementById('canvas');
+        const linesSvg = document.getElementById('lines-layer');
+        const pointsLayer = document.getElementById('points-layer');
+        const matrixContainer = document.getElementById('matrix-container');
+        const weightMatrixTable = document.getElementById('weight-matrix');
+
+        // === Отрисовка всех линий и весов ===
+        function redrawLinesAndLabels() {
+            if (!linesSvg || !canvasDiv) return;
+            const rect = canvasDiv.getBoundingClientRect();
+            const width = rect.width || 800;
+            const height = rect.height || 500;
+            linesSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            linesSvg.innerHTML = '';
+            // удаляем старые лейблы весов
+            document.querySelectorAll('.edge-weight-label').forEach(l => l.remove());
+
+            for (let edge of edgesList) {
+                if (edge.weight <= 0) continue;
+                const fromV = verticesData.find(v => v.id === edge.fromId);
+                const toV = verticesData.find(v => v.id === edge.toId);
+                if (!fromV || !toV) continue;
+
+                const x1 = fromV.x, y1 = fromV.y;
+                const x2 = toV.x, y2 = toV.y;
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("stroke", "#5a4d5e");
+                line.setAttribute("stroke-width", "3");
+                line.setAttribute("stroke-opacity", "0.85");
+                linesSvg.appendChild(line);
+
+                // метка веса
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'edge-weight-label';
+                labelDiv.textContent = edge.weight;
+                labelDiv.style.left = midX + 'px';
+                labelDiv.style.top = midY + 'px';
+                labelDiv.style.position = 'absolute';
+                canvasDiv.appendChild(labelDiv);
             }
+        }
 
-            const matrixContainer = document.getElementById('matrix-container');
-            const table = document.getElementById('weight-matrix');
+        // === Обновить матрицу из графа (рёбер) ===
+        function updateMatrixFromGraph() {
+            if (syncingFromMatrix) return;
+            syncingFromCanvas = true;
 
-            // Очистка таблицы
-            table.innerHTML = '';
+            if (!weightMatrixTable) return;
+            // Сбросить все недиагональные ячейки в 0
+            for (let i = 1; i <= currentN; i++) {
+                for (let j = 1; j <= currentN; j++) {
+                    if (i !== j) {
+                        const inp = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+                        if (inp) inp.value = '0';
+                    }
+                }
+            }
+            // Заполняем весами из рёбер
+            for (let edge of edgesList) {
+                const fromIdx = verticesData.find(v => v.id === edge.fromId)?.labelIndex;
+                const toIdx = verticesData.find(v => v.id === edge.toId)?.labelIndex;
+                if (fromIdx && toIdx && edge.weight > 0) {
+                    const inp1 = document.querySelector(`input[data-row='${fromIdx}'][data-col='${toIdx}']`);
+                    const inp2 = document.querySelector(`input[data-row='${toIdx}'][data-col='${fromIdx}']`);
+                    if (inp1) inp1.value = edge.weight;
+                    if (inp2) inp2.value = edge.weight;
+                }
+            }
+            syncingFromCanvas = false;
+        }
 
-            // Создание заголовка
+        // === Обновить граф из матрицы (создать/обновить рёбра) ===
+        function updateGraphFromMatrix() {
+            if (syncingFromCanvas) return;
+            syncingFromMatrix = true;
+
+            const newEdgesMap = new Map(); // ключ "minId-maxId"
+            for (let i = 1; i <= currentN; i++) {
+                for (let j = i+1; j <= currentN; j++) {
+                    const input = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+                    if (!input) continue;
+                    let val = parseFloat(input.value);
+                    if (isNaN(val)) val = 0;
+                    if (val < 0) val = 0;
+                    if (val > 0) {
+                        const fromVertex = verticesData.find(v => v.labelIndex === i);
+                        const toVertex = verticesData.find(v => v.labelIndex === j);
+                        if (fromVertex && toVertex) {
+                            const key = `${Math.min(fromVertex.id, toVertex.id)}-${Math.max(fromVertex.id, toVertex.id)}`;
+                            newEdgesMap.set(key, { fromId: fromVertex.id, toId: toVertex.id, weight: val });
+                        }
+                    }
+                }
+            }
+            edgesList = Array.from(newEdgesMap.values());
+            // перерисовка линий и весов
+            redrawLinesAndLabels();
+            syncingFromMatrix = false;
+        }
+
+        // === Создать вершины на канвасе (по кругу) ===
+        function createVerticesOnCanvas(n) {
+            pointsLayer.innerHTML = '';
+            verticesData = [];
+            edgesList = [];
+            const rect = canvasDiv.getBoundingClientRect();
+            const w = rect.width || 800;
+            const h = rect.height || 500;
+            const centerX = w / 2;
+            const centerY = h / 2;
+            const radius = Math.min(w, h) * 0.32;
+            const angleStep = (2 * Math.PI) / n;
+
+            for (let idx = 1; idx <= n; idx++) {
+                const angle = angleStep * (idx - 1) - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                const pointId = nextVertexId++;
+                const pointDiv = document.createElement('div');
+                pointDiv.className = 'graph-point';
+                pointDiv.textContent = idx;
+                pointDiv.setAttribute('data-id', pointId);
+                pointDiv.setAttribute('data-label', idx);
+                pointDiv.style.left = (x - 21) + 'px';
+                pointDiv.style.top = (y - 21) + 'px';
+                pointDiv.style.position = 'absolute';
+                pointDiv.draggable = true;
+                
+                // Drag & Drop логика
+                pointDiv.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', pointId);
+                    e.dataTransfer.effectAllowed = 'move';
+                    pointDiv.style.opacity = '0.7';
+                });
+                pointDiv.addEventListener('dragend', (e) => {
+                    pointDiv.style.opacity = '1';
+                });
+                pointDiv.addEventListener('drag', (e) => {
+                    if (e.clientX === 0 && e.clientY === 0) return;
+                    const canvasRect = canvasDiv.getBoundingClientRect();
+                    let newX = e.clientX - canvasRect.left - 21;
+                    let newY = e.clientY - canvasRect.top - 21;
+                    newX = Math.min(Math.max(8, newX), canvasRect.width - 42);
+                    newY = Math.min(Math.max(8, newY), canvasRect.height - 42);
+                    pointDiv.style.left = newX + 'px';
+                    pointDiv.style.top = newY + 'px';
+                    // обновляем координаты в данных
+                    const vertex = verticesData.find(v => v.id === pointId);
+                    if (vertex) {
+                        vertex.x = newX + 21;
+                        vertex.y = newY + 21;
+                    }
+                    redrawLinesAndLabels();
+                    // при перемещении вершин матрица НЕ меняется, только визуал
+                });
+                pointsLayer.appendChild(pointDiv);
+                verticesData.push({
+                    id: pointId,
+                    labelIndex: idx,
+                    x: x,
+                    y: y,
+                    dom: pointDiv
+                });
+            }
+            // Обновляем позиции в dom после добавления
+            verticesData.forEach(v => {
+                v.dom.style.left = (v.x - 21) + 'px';
+                v.dom.style.top = (v.y - 21) + 'px';
+            });
+            redrawLinesAndLabels();
+        }
+
+        // === Построить матрицу весов в DOM ===
+        function buildMatrixTable(n) {
+            weightMatrixTable.innerHTML = '';
+            // Заголовок
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
-            headerRow.appendChild(document.createElement('th')); // Пустая ячейка в углу
-
+            headerRow.appendChild(document.createElement('th')); // угол
             for (let i = 1; i <= n; i++) {
                 const th = document.createElement('th');
                 th.textContent = i;
                 headerRow.appendChild(th);
             }
             thead.appendChild(headerRow);
-            table.appendChild(thead);
-
-            // Создание тела таблицы
+            weightMatrixTable.appendChild(thead);
+            
             const tbody = document.createElement('tbody');
             for (let i = 1; i <= n; i++) {
-                const row = document.createElement('tr');
-
-                // Заголовок строки
-                const th = document.createElement('th');
-                th.textContent = i;
-                row.appendChild(th);
-
-                // Ячейки для ввода весов
+                const tr = document.createElement('tr');
+                const thRow = document.createElement('th');
+                thRow.textContent = i;
+                tr.appendChild(thRow);
                 for (let j = 1; j <= n; j++) {
                     const td = document.createElement('td');
                     const input = document.createElement('input');
                     input.type = 'number';
                     input.min = '0';
-                    input.value = i === j ? '0' : '0';
-                    input.dataset.row = i;
-                    input.dataset.col = j;
-
-                    // Диагональные элементы заблокированы и равны 0
+                    input.value = '0';
+                    input.setAttribute('data-row', i);
+                    input.setAttribute('data-col', j);
                     if (i === j) {
                         input.disabled = true;
                         input.style.background = '#e8e8e8';
+                        input.value = '0';
                     }
-
-                    // Автоматическая симметрия для неориентированного графа
-                    input.addEventListener('input', function() {
-                        const row = parseInt(this.dataset.row);
-                        const col = parseInt(this.dataset.col);
-                        const value = this.value;
-
-                        // Найти симметричную ячейку и обновить её
-                        const symmetricInput = document.querySelector(`input[data-row="${col}"][data-col="${row}"]`);
-                        if (symmetricInput) {
-                            symmetricInput.value = value;
+                    // Обработчик изменения ячейки -> обновление графа
+                    input.addEventListener('input', function(e) {
+                        if (syncingFromCanvas) return;
+                        let val = parseFloat(this.value);
+                        if (isNaN(val)) val = 0;
+                        if (val < 0) val = 0;
+                        // Симметрия для неориентированного графа
+                        const rowIdx = parseInt(this.dataset.row);
+                        const colIdx = parseInt(this.dataset.col);
+                        if (rowIdx !== colIdx) {
+                            const symmetric = document.querySelector(`input[data-row='${colIdx}'][data-col='${rowIdx}']`);
+                            if (symmetric && symmetric !== this) {
+                                symmetric.value = val;
+                            }
                         }
+                        updateGraphFromMatrix();  // динамически обновляем рёбра
                     });
-
                     td.appendChild(input);
-                    row.appendChild(td);
+                    tr.appendChild(td);
                 }
-
-                tbody.appendChild(row);
+                tbody.appendChild(tr);
             }
-            table.appendChild(tbody);
+            weightMatrixTable.appendChild(tbody);
+        }
 
-            // Показать контейнер с матрицей
+        // === Сбросить все веса и рёбра в матрице, синхронизировать ===
+        function resetMatrixToZeros() {
+            for (let i = 1; i <= currentN; i++) {
+                for (let j = 1; j <= currentN; j++) {
+                    if (i !== j) {
+                        const inp = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+                        if (inp) inp.value = '0';
+                    }
+                }
+            }
+            updateGraphFromMatrix();
+        }
+
+        // === Главная инициализация после нажатия кнопки "Generate Matrix" ===
+        async function initGraphAndMatrix() {
+            const nInput = document.getElementById('vertex-count');
+            let n = parseInt(nInput.value);
+            if (isNaN(n) || n < 2) n = 2;
+            if (n > 10) n = 10;
+            currentN = n;
+            
+            // Показать контейнер матрицы
             matrixContainer.style.display = 'block';
+            // Построить таблицу
+            buildMatrixTable(currentN);
+            // Создать вершины на канвасе
+            createVerticesOnCanvas(currentN);
+            // Очистить список рёбер
+            edgesList = [];
+            // Обнулить матрицу (все 0)
+            for (let i = 1; i <= currentN; i++) {
+                for (let j = 1; j <= currentN; j++) {
+                    if (i !== j) {
+                        const inp = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+                        if (inp) inp.value = '0';
+                    }
+                }
+            }
+            updateGraphFromMatrix(); // синхронизация графа (рёбер нет)
+            redrawLinesAndLabels();
+            updateStartVertexSelect(currentN);
+            
+            // Дополнительно: если хотим пример, создадим пару демо-рёбер (можно убрать, но оставим без)
+            // Чтобы показать работоспособность, добавим пару тестовых рёбер только при первом создании? необязательно.
+            // Оставим всё пустым, пользователь сам заполнит.
+        }
 
-            // Обновить выпадающий список стартовых вершин
-            updateStartVertexSelect(n);
-        });
-
-        // Обновление выпадающего списка стартовых вершин
+        // Обновление селекта стартовой вершины
         function updateStartVertexSelect(n) {
             const select = document.getElementById('start-vertex-select');
             select.innerHTML = '<option value="">Select start vertex</option>';
-
             for (let i = 1; i <= n; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = `Vertex ${i}`;
-                select.appendChild(option);
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `Vertex ${i}`;
+                select.appendChild(opt);
             }
-
-            // Показать секцию выбора стартовой вершины
             document.getElementById('start-vertex-section').style.display = 'block';
         }
 
         // Валидация матрицы
         function validateMatrix() {
             const inputs = document.querySelectorAll('#weight-matrix input:not([disabled])');
-            const n = parseInt(document.getElementById('vertex-count').value);
-
-            // Проверка: все поля заполнены
-            for (let input of inputs) {
-                if (input.value === '' || isNaN(parseFloat(input.value))) {
-                    return 'All matrix cells must be filled with numbers';
-                }
+            for (let inp of inputs) {
+                const val = parseFloat(inp.value);
+                if (isNaN(val)) return 'All cells must contain numbers';
+                if (val < 0) return 'Dijkstra does not allow negative weights';
             }
-
-            // Проверка: нет отрицательных весов
-            for (let input of inputs) {
-                if (parseFloat(input.value) < 0) {
-                    return 'Dijkstra algorithm does not allow negative weights';
-                }
-            }
-
-            // Проверка: диагональ равна нулю (уже обеспечено блокировкой)
-            // Проверка: симметричность (уже обеспечено автоматически)
-
-            return null; // Нет ошибок
+            return null;
         }
 
-        // Показать сообщение об ошибке
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+        function showError(msg) {
+            const errDiv = document.getElementById('error-message');
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+            setTimeout(() => errDiv.style.display = 'none', 4000);
         }
 
-        // Получить матрицу весов
-        function getWeightMatrix() {
-            const n = parseInt(document.getElementById('vertex-count').value);
-            const matrix = [];
-
-            for (let i = 1; i <= n; i++) {
-                matrix[i] = [];
-                for (let j = 1; j <= n; j++) {
-                    const input = document.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
-                    matrix[i][j] = parseFloat(input.value);
+        function getWeightMatrixFromDOM() {
+            const mat = [];
+            for (let i = 1; i <= currentN; i++) {
+                mat[i] = [];
+                for (let j = 1; j <= currentN; j++) {
+                    const inp = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+                    mat[i][j] = inp ? parseFloat(inp.value) : 0;
                 }
             }
-
-            return matrix;
+            return mat;
         }
 
         // Алгоритм Дейкстры
         function dijkstra(matrix, start) {
             const n = matrix.length - 1;
-            const dist = new Array(n + 1).fill(Infinity);
-            const visited = new Array(n + 1).fill(false);
-            const prev = new Array(n + 1).fill(null);
-
+            const dist = new Array(n+1).fill(Infinity);
+            const visited = new Array(n+1).fill(false);
+            const prev = new Array(n+1).fill(null);
             dist[start] = 0;
-
             for (let count = 0; count < n; count++) {
-                // Найти непосещённую вершину с минимальным расстоянием
-                let minDist = Infinity;
-                let u = -1;
-
+                let minDist = Infinity, u = -1;
                 for (let v = 1; v <= n; v++) {
                     if (!visited[v] && dist[v] < minDist) {
                         minDist = dist[v];
                         u = v;
                     }
                 }
-
-                if (u === -1) break; // Все достижимые вершины посещены
-
+                if (u === -1) break;
                 visited[u] = true;
-
-                // Релаксация рёбер
                 for (let v = 1; v <= n; v++) {
                     if (!visited[v] && matrix[u][v] > 0 && dist[u] !== Infinity) {
-                        const newDist = dist[u] + matrix[u][v];
-                        if (newDist < dist[v]) {
-                            dist[v] = newDist;
+                        const nd = dist[u] + matrix[u][v];
+                        if (nd < dist[v]) {
+                            dist[v] = nd;
                             prev[v] = u;
                         }
                     }
                 }
             }
-
             return { dist, prev };
         }
 
-        // Восстановление пути
         function getPath(prev, start, end) {
-            if (prev[end] === null && start !== end) {
-                return null; // Путь не существует
-            }
-
+            if (prev[end] === null && start !== end) return null;
             const path = [];
-            let current = end;
-
-            while (current !== null) {
-                path.unshift(current);
-                if (current === start) break;
-                current = prev[current];
+            let cur = end;
+            while (cur !== null) {
+                path.unshift(cur);
+                if (cur === start) break;
+                cur = prev[cur];
             }
-
             return path;
         }
 
-        // Отображение результатов
         function displayResults(start, dist, prev) {
             const n = dist.length - 1;
             const tbody = document.getElementById('distances-tbody');
-            const pathList = document.getElementById('path-list');
-
+            const pathDiv = document.getElementById('path-list');
             tbody.innerHTML = '';
-            pathList.innerHTML = '';
-
-            // Таблица расстояний
+            pathDiv.innerHTML = '';
             for (let i = 1; i <= n; i++) {
                 const row = document.createElement('tr');
-                const vertexCell = document.createElement('td');
-                const distCell = document.createElement('td');
-
-                vertexCell.textContent = i;
-
+                const tdV = document.createElement('td');
+                const tdD = document.createElement('td');
+                tdV.textContent = i;
                 if (dist[i] === Infinity) {
-                    distCell.textContent = '∞ (unreachable)';
-                    distCell.classList.add('unreachable');
+                    tdD.textContent = '∞ (unreachable)';
+                    tdD.classList.add('unreachable');
                 } else {
-                    distCell.textContent = dist[i];
+                    tdD.textContent = dist[i];
                 }
-
-                row.appendChild(vertexCell);
-                row.appendChild(distCell);
+                row.appendChild(tdV); row.appendChild(tdD);
                 tbody.appendChild(row);
             }
-
-            // Список путей
             for (let i = 1; i <= n; i++) {
-                const pathItem = document.createElement('div');
-                pathItem.classList.add('path-item');
-
+                const item = document.createElement('div');
+                item.className = 'path-item';
                 if (i === start) {
-                    pathItem.textContent = `Path to vertex ${i}: ${i} (start vertex), length = 0`;
+                    item.textContent = `Path to vertex ${i}: ${i} (start), length = 0`;
                 } else if (dist[i] === Infinity) {
-                    pathItem.innerHTML = `<span class="unreachable">Vertex ${i} is unreachable from start vertex ${start}</span>`;
+                    item.innerHTML = `<span class="unreachable">Vertex ${i} is unreachable from ${start}</span>`;
                 } else {
                     const path = getPath(prev, start, i);
-                    pathItem.textContent = `Path to vertex ${i}: ${path.join(' → ')}, length = ${dist[i]}`;
+                    item.textContent = `Path to ${i}: ${path.join(' → ')}, length = ${dist[i]}`;
                 }
-
-                pathList.appendChild(pathItem);
+                pathDiv.appendChild(item);
             }
-
-            // Показать секцию результатов
             document.getElementById('results-section').style.display = 'block';
         }
 
-        // Обработчик кнопки расчёта
-        document.getElementById('calculate-btn').addEventListener('click', function() {
-            // Валидация
-            const error = validateMatrix();
-            if (error) {
-                showError(error);
-                return;
-            }
-
-            const startVertex = parseInt(document.getElementById('start-vertex-select').value);
-            if (!startVertex) {
-                showError('Please select a start vertex');
-                return;
-            }
-
-            // Получить матрицу и выполнить алгоритм
-            const matrix = getWeightMatrix();
-            const { dist, prev } = dijkstra(matrix, startVertex);
-
-            // Отобразить результаты
-            displayResults(startVertex, dist, prev);
+        // Обработчики событий
+        document.getElementById('generate-matrix-btn').addEventListener('click', () => {
+            initGraphAndMatrix();
         });
+
+        document.getElementById('calculate-btn').addEventListener('click', () => {
+            const err = validateMatrix();
+            if (err) { showError(err); return; }
+            const startVal = parseInt(document.getElementById('start-vertex-select').value);
+            if (!startVal) { showError('Select start vertex'); return; }
+            const matrix = getWeightMatrixFromDOM();
+            const { dist, prev } = dijkstra(matrix, startVal);
+            displayResults(startVal, dist, prev);
+        });
+
+        // Синхронизация при изменении размера окна (корректировка позиций)
+        window.addEventListener('resize', () => {
+            if (verticesData.length === currentN) {
+                // не перемещаем вершины, просто перерисовываем линии
+                redrawLinesAndLabels();
+            }
+        });
+
+        // Периодическая синхронизация canvas -> matrix на случай внешних модификаций
+        setInterval(() => {
+            if (!syncingFromMatrix && matrixContainer.style.display !== 'none') {
+                updateMatrixFromGraph();
+            }
+        }, 400);
+        
+        // Первоначальный вызов для демонстрации (по умолчанию создадим с n=4)
+        setTimeout(() => {
+            initGraphAndMatrix();
+        }, 100);
     </script>
 </body>
 </html>
