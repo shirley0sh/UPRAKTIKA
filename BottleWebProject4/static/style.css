@@ -1,15 +1,15 @@
+/* ==================== GLOBAL RESET & BASE ==================== */
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 0;
     margin: 0;
-    padding: 20px;
     min-height: 100vh;
-    height: 100vh;
     position: relative;
     background-image: url('/static/background.png');
     background-size: cover;
@@ -29,6 +29,327 @@ body::before {
     z-index: -1;
 }
 
+/* ==================== HEADER ==================== */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-family: 'Arial Black', sans-serif;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+/* ==================== TABS ==================== */
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 15px;
+    color: #fff;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 600;
+}
+
+.tab-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.tab-button.active {
+    border-bottom-color: #fff;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px 4px 0 0;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+.main-content {
+    padding-top: 90px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+    background: rgba(155, 142, 162, 0.95);
+    border-radius: 8px;
+    padding: 30px;
+    color: #fff;
+    min-height: 500px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ==================== FORMS & INPUTS ==================== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #fff;
+}
+
+input, textarea {
+    width: 100%;
+    max-width: 500px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+textarea {
+    min-height: 120px;
+}
+
+button {
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #fff;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 4px;
+    transition: all 0.3s;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==================== CONTENT TYPOGRAPHY ==================== */
+.tab-content h2,
+.tab-content p,
+.tab-content ul,
+.tab-content li,
+.tab-content a {
+    color: #fff;
+}
+
+.tab-content a {
+    text-decoration: underline;
+}
+
+.content-text {
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.content-text h2 {
+    margin-bottom: 15px;
+    font-size: 28px;
+    color: #fff;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.content-text h3 {
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 22px;
+    color: #fff;
+}
+
+.content-text p {
+    margin-bottom: 15px;
+}
+
+.content-text ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.content-text li {
+    margin-bottom: 8px;
+}
+
+/* ==================== THEORY STYLES ==================== */
+.intro {
+    background: rgba(248, 249, 250, 0.2);
+    padding: 15px;
+    border-left: 4px solid #3498db;
+    border-radius: 0 4px 4px 0;
+    margin: 20px 0;
+}
+
+.complexity {
+    display: inline-block;
+    background: rgba(232, 244, 248, 0.3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    margin: 15px 0;
+}
+
+code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: rgba(241, 241, 241, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+.formula {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(221, 221, 221, 0.3);
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-family: 'Times New Roman', serif;
+    font-style: italic;
+    text-align: center;
+}
+
+.matrix {
+    font-family: monospace;
+    white-space: pre;
+    text-align: center;
+    margin: 10px 0;
+    background: rgba(248, 249, 250, 0.1);
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.note {
+    background: rgba(255, 243, 205, 0.2);
+    border: 1px solid rgba(255, 234, 167, 0.3);
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.proof {
+    border-left: 3px solid #9b59b6;
+    padding-left: 15px;
+    margin: 15px 0;
+    font-style: italic;
+}
+
+ul.toc {
+    list-style: none;
+    padding-left: 0;
+    background: rgba(248, 249, 250, 0.1);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+ul.toc li {
+    margin: 5px 0;
+}
+
+ul.toc a {
+    color: #87ceeb;
+    text-decoration: none;
+}
+
+ul.toc a:hover {
+    text-decoration: underline;
+}
+
+/* ==================== SYNTAX HIGHLIGHTING ==================== */
+.keyword {
+    color: #f92672;
+    font-weight: bold;
+}
+
+.function {
+    color: #66d9ef;
+}
+
+.comment {
+    color: #75715e;
+    font-style: italic;
+}
+
+.string {
+    color: #a6e22e;
+}
+
+/* ==================== EDITOR BUTTON ==================== */
+.editor-btn {
+    background: #9b59b6;
+    padding: 12px 24px;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    transition: background 0.3s;
+}
+
+.editor-btn:hover {
+    background: #8e44ad;
+}
+
+/* ==================== CONTAINER & LAYOUT (из оригинального style.css) ==================== */
 .container {
     display: flex;
     gap: 20px;
@@ -39,7 +360,7 @@ body::before {
     z-index: 1;
 }
 
-/* Toolbar styles */
+/* ==================== TOOLBAR ==================== */
 .toolbar {
     width: 320px;
     min-width: 280px;
@@ -63,7 +384,7 @@ body::before {
     padding-bottom: 12px;
 }
 
-/* Draggable point button */
+/* ==================== DRAGGABLE POINT ==================== */
 .draggable-point {
     background: #5a4d5e;
     color: white;
@@ -92,7 +413,7 @@ body::before {
     transform: translateY(0);
 }
 
-/* Random panel styles */
+/* ==================== RANDOM PANEL ==================== */
 .random-panel {
     margin-top: 10px;
     padding: 15px;
@@ -133,7 +454,7 @@ body::before {
     background: white;
 }
 
-/* Button styles - темнее и жирнее */
+/* ==================== BUTTON VARIANTS ==================== */
 .btn {
     padding: 12px;
     width: 100%;
@@ -147,38 +468,23 @@ body::before {
     margin-bottom: 10px;
 }
 
-.btn-primary {
-    background-color: #5a4d5e;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #6e5d73;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary {
-    background-color: #5a4d5e;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #6e5d73;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
+.btn-primary,
+.btn-secondary,
 .btn-warning {
     background-color: #5a4d5e;
     color: white;
 }
 
+.btn-primary:hover,
+.btn-secondary:hover,
 .btn-warning:hover {
     background-color: #6e5d73;
-    color: white;
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-warning:hover {
+    color: white;
 }
 
 .btn-generate {
@@ -201,7 +507,7 @@ body::before {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Canvas styles */
+/* ==================== CANVAS & POINTS ==================== */
 .canvas {
     flex: 1;
     background: rgba(155, 142, 162, 0.9);
@@ -218,7 +524,6 @@ body::before {
     height: 100%;
 }
 
-/* Point styles */
 .point {
     position: absolute;
     width: 38px;
@@ -256,7 +561,7 @@ body::before {
     color: white;
 }
 
-/* Lines layer */
+/* ==================== LINES ==================== */
 .lines-layer {
     position: absolute;
     top: 0;
@@ -281,7 +586,7 @@ body::before {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-/* Modal styles */
+/* ==================== MODAL ==================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -312,7 +617,7 @@ body::before {
     margin-bottom: 20px;
 }
 
-/* Table styles */
+/* ==================== TABLES ==================== */
 .distance-table {
     border-collapse: collapse;
     width: 100%;
@@ -341,22 +646,11 @@ body::before {
     background-color: #f5f0eb;
 }
 
-/* Tab styles */
+/* ==================== TABS (внутри модалки) ==================== */
 .tab-container {
     display: flex;
     border-bottom: 2px solid #e8d7cf;
     margin-bottom: 20px;
-}
-
-.tab-button {
-    padding: 10px 20px;
-    cursor: pointer;
-    border: none;
-    border-radius: 6px 6px 0 0;
-    font-family: 'Segoe UI', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
 }
 
 .tab-button-active {
@@ -373,7 +667,7 @@ body::before {
     background-color: #bdc2ce;
 }
 
-/* Distance cell colors */
+/* ==================== DISTANCE CELLS ==================== */
 .distance-cell-short {
     background-color: #e8f5e9;
     color: #2e7d32;
@@ -401,12 +695,12 @@ body::before {
     background-color: #bdc2ce;
 }
 
-/* Utility classes */
+/* ==================== UTILITIES ==================== */
 .text-center {
     text-align: center;
 }
 
-/* Scrollbar */
+/* ==================== SCROLLBAR ==================== */
 .toolbar::-webkit-scrollbar {
     width: 8px;
 }
@@ -423,4 +717,26 @@ body::before {
 
 .toolbar::-webkit-scrollbar-thumb:hover {
     background: #6e5d73;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .logo {
+        white-space: normal;
+        text-align: center;
+    }
+    .tabs {
+        justify-content: center;
+    }
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .main-content {
+        padding-top: 130px;
+    }
 }
