@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\views\\index.tpl||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\static\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{EFE1D82F-6E83-4330-9FEA-0713B280C483}|BottleWebProject4\\BottleWebProject4.pyproj|solutionrelative:BottleWebProject4\\app.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,20 +46,33 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "style.css",
+              "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css",
+              "RelativeDocumentMoniker": "BottleWebProject4\\static\\style.css",
+              "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\static\\style.css",
+              "RelativeToolTip": "BottleWebProject4\\static\\style.css",
+              "ViewState": "AgIAAJkBAAAAAAAAAAAAAKsBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-05-16T10:15:41.216Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "index.tpl",
               "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl",
               "RelativeDocumentMoniker": "BottleWebProject4\\views\\index.tpl",
               "ToolTip": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\views\\index.tpl",
               "RelativeToolTip": "BottleWebProject4\\views\\index.tpl",
-              "ViewState": "AgIAADoCAAAAAAAAAAAAAEcCAAAvAAAAAAAAAA==",
+              "ViewState": "AgIAAGABAAAAAAAAAAAIwHYBAABTAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2026-05-16T10:05:36.241Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "app.py",
               "DocumentMoniker": "C:\\Users\\eg0rg\\Desktop\\PraktikaU\\BottleWebProject4\\app.py",
               "RelativeDocumentMoniker": "BottleWebProject4\\app.py",
@@ -63,8 +80,7 @@
               "RelativeToolTip": "BottleWebProject4\\app.py",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
-              "WhenOpened": "2026-05-16T10:03:43.792Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-16T10:03:43.792Z"
             }
           ]
         }
