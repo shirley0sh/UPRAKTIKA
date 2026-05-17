@@ -330,7 +330,7 @@
         <div class="header-content">
             <div class="logo">Graphix</div>
             <div class="tabs">
-                <button class="tab-button active" data-tab="home">Home</button>
+                <button class="tab-button active" data-tab="home">Главная</button>
                 <button class="tab-button" data-tab="floyd">Floyd-Warshall</button>
                 <button class="tab-button" data-tab="dijkstra">Dijkstra</button>
                 <button class="tab-button" data-tab="prim">Алгоритм Прима</button>

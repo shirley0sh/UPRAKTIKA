@@ -63,6 +63,7 @@
     <Content Include="static\scripts\jquery.validate.unobtrusive.js" />
     <Content Include="static\scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="static\scripts\modernizr-2.6.2.js" />
+    <Content Include="static\scripts\prim.js" />
     <Content Include="static\scripts\respond.js" />
     <Content Include="static\scripts\respond.min.js" />
     <Content Include="static\scripts\_references.js" />
@@ -71,6 +72,9 @@
     <Content Include="views\index.tpl" />
     <Content Include="views\layout.tpl" />
     <Content Include="views\message.tpl">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="views\prim.tpl">
       <SubType>Code</SubType>
     </Content>
   </ItemGroup>
