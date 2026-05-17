@@ -1,0 +1,15 @@
+# Для Visual Studio
+.vs/
+*.suo
+*.user
+
+# Для Python
+__pycache__/
+*.pyc
+env/
+env1/
+venv/
+obj/
+
+# Другое
+*.backup.json

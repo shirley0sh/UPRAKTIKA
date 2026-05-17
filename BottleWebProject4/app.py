@@ -148,6 +148,11 @@ def dijkstra_calculate():
     response.content_type = 'application/json'
     return json.dumps(result)
 
+# =============API ДЛЯ АЛГОРИТМА ПРИМА =================
+@app.route('/prim')
+def prim_page():
+    return template('prim')
+
 if __name__ == '__main__':
     print("=" * 50)
     print("Graphix - Graph Theory Visualization")
