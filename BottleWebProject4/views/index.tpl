@@ -332,7 +332,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="home">Главная</button>
                 <button class="tab-button" data-tab="floyd">Floyd-Warshall</button>
-                <button class="tab-button" data-tab="dijkstra">Алгоритм Дейкстра</button>
+                <button class="tab-button" data-tab="dijkstra">Алгоритм Дейкстры</button>
                 <button class="tab-button" data-tab="prim">Алгоритм Прима</button>
                 <button class="tab-button" data-tab="kruskal">Kruskal</button>
                 <button class="tab-button" data-tab="about">About</button>
