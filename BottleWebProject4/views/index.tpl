@@ -332,7 +332,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="home">Главная</button>
                 <button class="tab-button" data-tab="floyd">Floyd-Warshall</button>
-                <button class="tab-button" data-tab="dijkstra">Dijkstra</button>
+                <button class="tab-button" data-tab="dijkstra">Алгоритм Дейкстра</button>
                 <button class="tab-button" data-tab="prim">Алгоритм Прима</button>
                 <button class="tab-button" data-tab="kruskal">Kruskal</button>
                 <button class="tab-button" data-tab="about">About</button>
@@ -566,14 +566,440 @@
         </div>
 
         <!-- Вкладка Dijkstra -->
-        <div id="dijkstra" class="tab-content">
-            <div class="content-text">
-                <h2>Dijkstra's Algorithm</h2>
-                <p>Click the button below to open the interactive graph editor with Dijkstra's algorithm.</p>
-                <p>Dijkstra's algorithm finds the shortest paths from a single source vertex to all other vertices.</p>
-                <button onclick="window.location.href='/dijkstra'" style="margin-top: 15px;">Open Dijkstra Editor →</button>
-            </div>
+       <div id="dijkstra" class="tab-content">
+    <div class="content-text">
+        <button onclick="window.location.href='/dijkstra'" class="editor-btn">Решить задачу с помощью алгоритма Дейкстры</button>
+
+        <h1>Алгоритм Дейкстры</h1>
+
+        <div class="intro">
+            <strong>Алгоритм Дейкстры</strong> — классический алгоритм нахождения кратчайших путей от одной вершины (источника) до всех остальных вершин во взвешенном графе с неотрицательными весами рёбер.
+            Алгоритм широко используется в маршрутизации, навигационных системах и оптимизации сетей.
+            <br><br>
+            <strong>Сложность:</strong>
+            Время — <span class="complexity">O(|E|·log|V|)</span> (с бинарной кучей),
+            Память — <span class="complexity">O(|V| + |E|)</span>.
+            <br>Разработан в 1956 году Эдсгером Дейкстрой и опубликован в 1959 году.
         </div>
+
+        <nav>
+            <h3>Содержание</h3>
+            <ul class="toc">
+                <li><a href="#problem-dijkstra">1. Постановка задачи</a></li>
+                <li><a href="#description-dijkstra">2. Описание алгоритма</a></li>
+                <li><a href="#code-basic-dijkstra">3. Код (базовая версия)</a></li>
+                <li><a href="#code-optimal-dijkstra">4. Код (оптимизированный с кучей)</a></li>
+                <li><a href="#example-dijkstra">5. Пример работы</a></li>
+                <li><a href="#limitations-dijkstra">6. Ограничения и особенности</a></li>
+                <li><a href="#comparison-dijkstra">7. Сравнение с алгоритмом Беллмана-Форда</a></li>
+                <li><a href="#applications-dijkstra">8. Области применения</a></li>
+            </ul>
+        </nav>
+
+        <h2 id="problem-dijkstra">1. Постановка задачи</h2>
+        <p>Дан взвешенный ориентированный или неориентированный граф <code>G(V, E)</code>, где <code>V</code> — множество вершин, <code>E</code> — множество рёбер, каждому ребру приписан неотрицательный вес <code>w(u, v) ≥ 0</code>. Задана начальная вершина <code>s ∈ V</code>.</p>
+
+        <div class="formula">
+            G = (V, E), w: E → ℝ<sub>≥0</sub>
+        </div>
+
+        <p><strong>Требуется:</strong> найти для каждой вершины <code>v ∈ V</code> кратчайшее расстояние <code>d(v)</code> от <code>s</code> до <code>v</code>, то есть минимальную сумму весов рёбер на пути из <code>s</code> в <code>v</code>.</p>
+
+        <h2 id="description-dijkstra">2. Описание алгоритма</h2>
+        <p>Алгоритм Дейкстры относится к классу <strong>жадных алгоритмов</strong>. На каждом шаге он выбирает вершину с наименьшим известным расстоянием и релаксирует (улучшает) расстояния до её соседей.</p>
+
+        <p><strong>Основная идея:</strong></p>
+        <ul>
+            <li>Инициализировать расстояния: <code>d[s] = 0</code>, для всех остальных <code>d[v] = ∞</code>.</li>
+            <li>Поддерживать множество <strong>непосещённых</strong> вершин.</li>
+            <li>На каждом шаге извлекать непосещённую вершину <code>u</code> с минимальным <code>d[u]</code>.</li>
+            <li>Для каждого соседа <code>v</code> вершины <code>u</code> проверять: если <code>d[u] + w(u, v) < d[v]</code>, то обновлять <code>d[v]</code>.</li>
+            <li>Помечать <code>u</code> как посещённую и повторять, пока все вершины не будут обработаны.</li>
+        </ul>
+
+        <div class="proof">
+            <strong>Корректность:</strong> Алгоритм Дейкстры корректно находит кратчайшие пути в графах с неотрицательными весами, поскольку при извлечении вершины с минимальным расстоянием это расстояние уже является окончательным (ни один более длинный путь не может привести к меньшему расстоянию).
+        </div>
+
+        <h2 id="code-basic-dijkstra">3. Код (базовая версия)</h2>
+        <p>Реализация с матрицей смежности и линейным поиском минимальной вершины:</p>
+
+        <pre><code>function dijkstra_basic(graph, n, start):
+    // Инициализация
+    visited = [False] * n
+    dist = [∞] * n
+    prev = [-1] * n          // для восстановления пути
+    
+    dist[start] = 0
+    
+    for _ in range(n):
+        // Находим непосещённую вершину с минимальным расстоянием
+        u = -1
+        for i in range(n):
+            if not visited[i] and (u == -1 or dist[i] < dist[u]):
+                u = i
+        
+        if dist[u] == ∞:
+            break           // остальные вершины недостижимы
+        
+        visited[u] = True
+        
+        // Релаксация рёбер
+        for v in range(n):
+            if graph[u][v] > 0 and not visited[v]:
+                new_dist = dist[u] + graph[u][v]
+                if new_dist < dist[v]:
+                    dist[v] = new_dist
+                    prev[v] = u
+    
+    return dist, prev</code></pre>
+
+        <div class="note">
+            <strong>Сложность базовой версии:</strong> <span class="complexity">O(|V|²)</span> — хорошо для плотных графов (где |E| близко к |V|²).
+        </div>
+
+        <h2 id="code-optimal-dijkstra">4. Код (оптимизированный с кучей)</h2>
+        <p>Для разреженных графов эффективнее использовать <strong>бинарную кучу</strong> (приоритетную очередь):</p>
+
+        <pre><code>import heapq
+
+function dijkstra_heap(graph, n, start):
+    dist = [∞] * n
+    prev = [-1] * n
+    dist[start] = 0
+    
+    // Куча: (расстояние, вершина)
+    heap = [(0, start)]
+    
+    while heap:
+        current_dist, u = heapq.heappop(heap)
+        
+        // Пропускаем устаревшие записи
+        if current_dist > dist[u]:
+            continue
+        
+        // Для каждого соседа v
+        for v, weight in graph[u]:
+            new_dist = dist[u] + weight
+            if new_dist < dist[v]:
+                dist[v] = new_dist
+                prev[v] = u
+                heapq.heappush(heap, (new_dist, v))
+    
+    return dist, prev</code></pre>
+
+        <p><strong>Сложность:</strong> <span class="complexity">O(|E|·log|V|)</span> — оптимально для разреженных графов.</p>
+
+        <h2 id="example-dijkstra">5. Пример работы</h2>
+        <p>Рассмотрим граф из 5 вершин. Стартовая вершина — <strong>0</strong>.</p>
+
+        <div class="matrix">
+        Рёбра (неориентированные):<br>
+        (0-1): 4, (0-2): 2<br>
+        (1-2): 1, (1-3): 5<br>
+        (2-3): 8, (2-4): 10<br>
+        (3-4): 2
+        </div>
+
+        <p><strong>Пошаговое выполнение алгоритма Дейкстры:</strong></p>
+        <ul>
+            <li><strong>Шаг 0 (инициализация):</strong> dist[0]=0, dist[1..4]=∞. Непосещённые: {0,1,2,3,4}</li>
+            <li><strong>Шаг 1:</strong> Выбираем вершину 0 (dist=0). Обновляем соседей: dist[1]=4, dist[2]=2. Посещена: {0}</li>
+            <li><strong>Шаг 2:</strong> Выбираем вершину 2 (dist=2). Обновляем: через 2 до 1: 2+1=3 &lt; 4 → dist[1]=3; до 3: 2+8=10; до 4: 2+10=12. Посещена: {0,2}</li>
+            <li><strong>Шаг 3:</strong> Выбираем вершину 1 (dist=3). Обновляем: через 1 до 3: 3+5=8 &lt; 10 → dist[3]=8; до 4: 3+∞=∞ (без изменений). Посещена: {0,2,1}</li>
+            <li><strong>Шаг 4:</strong> Выбираем вершину 3 (dist=8). Обновляем: через 3 до 4: 8+2=10 &lt; 12 → dist[4]=10. Посещена: {0,2,1,3}</li>
+            <li><strong>Шаг 5:</strong> Выбираем вершину 4 (dist=10). Нет непосещённых соседей. Конец.</li>
+        </ul>
+
+        <div class="formula">
+            <strong>Результат (кратчайшие расстояния от вершины 0):</strong><br>
+            dist[0] = 0<br>
+            dist[1] = 3  (путь: 0 → 2 → 1)<br>
+            dist[2] = 2  (путь: 0 → 2)<br>
+            dist[3] = 8  (путь: 0 → 2 → 1 → 3)<br>
+            dist[4] = 10 (путь: 0 → 2 → 1 → 3 → 4)
+        </div>
+
+        <h2 id="limitations-dijkstra">6. Ограничения и особенности</h2>
+        <ul>
+            <li><strong>Неотрицательные веса:</strong> алгоритм Дейкстры работает только при условии, что все веса рёбер неотрицательны. При наличии отрицательных весов результат может быть неверным.</li>
+            <li><strong>Ориентированные и неориентированные графы:</strong> алгоритм одинаково хорошо работает для обоих типов графов.</li>
+            <li><strong>Недостижимые вершины:</strong> для вершин, недостижимых из источника, расстояние остаётся равным бесконечности.</li>
+            <li><strong>Поиск пути:</strong> помимо расстояний, алгоритм может сохранять массив предыдущих вершин <code>prev</code> для восстановления кратчайших путей.</li>
+        </ul>
+
+        <div class="proof">
+            <strong>Важно:</strong> Если в графе есть ребро с отрицательным весом, следует использовать алгоритм Беллмана-Форда, который корректно обрабатывает отрицательные веса (но медленнее — O(|V|·|E|)).
+        </div>
+
+        <h2 id="comparison-dijkstra">7. Сравнение с алгоритмом Беллмана-Форда</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Характеристика</th>
+                    <th>Алгоритм Дейкстры</th>
+                    <th>Алгоритм Беллмана-Форда</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ограничение на веса</td>
+                    <td>Только неотрицательные</td>
+                    <td>Любые (в т.ч. отрицательные)</td>
+                </tr>
+                <tr class="alt">
+                    <td>Временная сложность</td>
+                    <td>O(|E|·log|V|) с кучей</td>
+                    <td>O(|V|·|E|)</td>
+                </tr>
+                <tr>
+                    <td>Обнаружение отрицательных циклов</td>
+                    <td>Нет</td>
+                    <td>Да</td>
+                </tr>
+                <tr class="alt">
+                    <td>Когда лучше</td>
+                    <td>Графы с неотрицательными весами (большинство практических задач)</td>
+                    <td>Графы с отрицательными весами или требующие проверки на отрицательные циклы</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 id="applications-dijkstra">8. Области применения</h2>
+        <ul>
+            <li><strong>GPS-навигация:</strong> поиск кратчайшего маршрута между точками на карте (дороги с учётом пробок, расстояний)</li>
+            <li><strong>Сетевые протоколы маршрутизации:</strong> OSPF (Open Shortest Path First) использует алгоритм Дейкстры для построения таблиц маршрутизации</li>
+            <li><strong>Телекоммуникации:</strong> оптимизация путей в оптоволоконных сетях, минимизация задержек</li>
+            <li><strong>Социальные сети:</strong> поиск кратчайшей цепочки знакомств между пользователями</li>
+            <li><strong>Игры и ИИ:</strong> поиск путей для персонажей в игровых мирах (с учётом препятствий)</li>
+            <li><strong>Транспортная логистика:</strong> оптимальная маршрутизация доставки грузов</li>
+            <li><strong>Биоинформатика:</strong> анализ метаболических путей и сетей взаимодействия белков</li>
+        </ul>
+
+        <hr>
+
+        <div class="sources">
+            <strong>Источники:</strong>
+            <ul>
+                <li>Dijkstra, E. W. (1959). "A note on two problems in connexion with graphs". Numerische Mathematik</li>
+                <li>Cormen T., Leiserson C., Rivest R., Stein C. — "Алгоритмы: построение и анализ" (глава 24)</li>
+                <li>Седжвик Р. — "Фундаментальные алгоритмы на C++" (часть 5, глава 21)</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Стили для блока теории Дейкстры — гармоничное сочетание двух версий */
+#dijkstra .content-text {
+    max-width: 1100px;
+    margin: 0 auto;
+    color: #2c3e50;
+}
+
+#dijkstra h1 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 700;
+    border-left: 5px solid #5a4d5e;
+    padding-left: 20px;
+}
+
+#dijkstra h2 {
+    font-size: 1.6rem;
+    color: #2c3e50;
+    margin: 35px 0 15px 0;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(90, 77, 94, 0.2);
+}
+
+#dijkstra h3 {
+    font-size: 1.3rem;
+    color: #3a4a5a;
+    margin: 20px 0 12px 0;
+}
+
+#dijkstra .editor-btn {
+    background: #5a4d5e;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 25px;
+}
+
+#dijkstra .editor-btn:hover {
+    background: #7b6b80;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+}
+
+#dijkstra .intro {
+    background: rgba(90, 77, 94, 0.08);
+    padding: 20px 25px;
+    border-radius: 16px;
+    margin: 20px 0;
+    line-height: 1.6;
+    border-left: 4px solid #5a4d5e;
+}
+
+#dijkstra .complexity {
+    font-family: monospace;
+    background: #2c3e50;
+    color: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+#dijkstra nav {
+    background: rgba(187, 195, 208, 0.3);
+    padding: 20px 25px;
+    border-radius: 20px;
+    margin: 25px 0;
+}
+
+#dijkstra .toc {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    list-style: none;
+    margin-top: 15px;
+}
+
+#dijkstra .toc li a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-block;
+    padding: 5px 0;
+}
+
+#dijkstra .toc li a:hover {
+    color: #5a4d5e;
+    text-decoration: underline;
+}
+
+#dijkstra code {
+    background: #2c3e50;
+    color: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+#dijkstra pre {
+    background: #1e2a3a;
+    color: #e2e8f0;
+    padding: 18px;
+    border-radius: 16px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+#dijkstra pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+#dijkstra .formula {
+    background: #2c3e50;
+    color: #e2e8f0;
+    padding: 12px 18px;
+    border-radius: 14px;
+    text-align: center;
+    margin: 20px 0;
+    font-family: monospace;
+}
+
+#dijkstra .proof, #dijkstra .note {
+    background: rgba(90, 77, 94, 0.06);
+    border-left: 4px solid #5a4d5e;
+    padding: 15px 20px;
+    border-radius: 14px;
+    margin: 20px 0;
+}
+
+#dijkstra .note {
+    border-left-color: #3498db;
+}
+
+#dijkstra .matrix {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin: 20px 0;
+    border: 1px solid #e2e8f0;
+    font-family: monospace;
+}
+
+#dijkstra .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#dijkstra .comparison-table th {
+    background: #5a4d5e;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+#dijkstra .comparison-table td {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+}
+
+#dijkstra .comparison-table .alt {
+    background: #f8f9fc;
+}
+
+#dijkstra .sources {
+    background: rgba(90, 77, 94, 0.06);
+    padding: 18px 22px;
+    border-radius: 16px;
+    margin-top: 25px;
+}
+
+#dijkstra .sources ul {
+    margin: 10px 0 0 20px;
+}
+
+#dijkstra hr {
+    margin: 30px 0 20px;
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #cbd5e0, transparent);
+}
+
+#dijkstra p, #dijkstra li {
+    line-height: 1.6;
+    color: #2c3e50;
+}
+
+#dijkstra ul {
+    margin: 12px 0 12px 25px;
+}
+</style>
 
         <!-- Вкладка Prim с теорией -->
 <div id="prim" class="tab-content">
