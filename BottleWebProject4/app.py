@@ -20,6 +20,10 @@ def index():
 def floyd_page():
     return template('floyd')
 
+@app.route('/kruskal')
+def kruskal_page():
+    return template('kruskal')
+
 @app.route('/dijkstra')
 def dijkstra_page():
     return template('dijkstra')
