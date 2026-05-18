@@ -181,27 +181,28 @@ button:disabled {
 }
 
 .content-text {
-    line-height: 1.6;
-    font-size: 16px;
+    line-height: 1.8;
+    font-size: 18px;
 }
 
 .content-text h2 {
     margin-bottom: 15px;
-    font-size: 28px;
+    font-size: 32px;
     color: #fff;
     border-bottom: 2px solid #3498db;
     padding-bottom: 10px;
 }
 
 .content-text h3 {
-    margin-bottom: 10px;
-    margin-top: 20px;
-    font-size: 22px;
+    margin-bottom: 12px;
+    margin-top: 25px;
+    font-size: 26px;
     color: #fff;
 }
 
 .content-text p {
     margin-bottom: 15px;
+    font-size: 18px;
 }
 
 .content-text ul {
@@ -211,76 +212,93 @@ button:disabled {
 
 .content-text li {
     margin-bottom: 8px;
+    font-size: 18px;
 }
 
 /* ==================== THEORY STYLES ==================== */
 .intro {
     background: rgba(248, 249, 250, 0.2);
-    padding: 15px;
+    padding: 18px;
     border-left: 4px solid #3498db;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 8px 8px 0;
     margin: 20px 0;
+    font-size: 18px;
 }
 
 .complexity {
     display: inline-block;
     background: rgba(232, 244, 248, 0.3);
-    padding: 2px 8px;
-    border-radius: 3px;
+    padding: 4px 10px;
+    border-radius: 5px;
     font-family: monospace;
     font-weight: bold;
+    font-size: 18px;
 }
 
 pre {
     background: #2d2d2d;
     color: #f8f8f2;
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     overflow-x: auto;
     font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 0.9em;
+    font-size: 16px;
     margin: 15px 0;
+    line-height: 1.5;
 }
 
 code {
     font-family: 'Consolas', 'Monaco', monospace;
     background: rgba(241, 241, 241, 0.2);
-    padding: 2px 6px;
-    border-radius: 3px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 pre code {
     background: none;
     padding: 0;
+    font-size: 16px;
 }
 
+/* Увеличенный шрифт для формул */
 .formula {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(221, 221, 221, 0.3);
-    padding: 10px 15px;
-    margin: 10px 0;
-    border-radius: 4px;
+    padding: 15px 20px;
+    margin: 15px 0;
+    border-radius: 8px;
     font-family: 'Times New Roman', serif;
     font-style: italic;
     text-align: center;
+    font-size: 24px;
+    line-height: 1.4;
+}
+
+.formula sub,
+.formula sup {
+    font-size: 16px;
 }
 
 .matrix {
     font-family: monospace;
     white-space: pre;
     text-align: center;
-    margin: 10px 0;
+    margin: 15px 0;
     background: rgba(248, 249, 250, 0.1);
-    padding: 10px;
-    border-radius: 4px;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 18px;
+    line-height: 1.8;
 }
 
 .note {
     background: rgba(255, 243, 205, 0.2);
     border: 1px solid rgba(255, 234, 167, 0.3);
-    padding: 10px 15px;
-    border-radius: 4px;
-    margin: 10px 0;
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin: 15px 0;
+    font-size: 17px;
 }
 
 .proof {
@@ -288,6 +306,7 @@ pre code {
     padding-left: 15px;
     margin: 15px 0;
     font-style: italic;
+    font-size: 17px;
 }
 
 ul.toc {
@@ -295,16 +314,18 @@ ul.toc {
     padding-left: 0;
     background: rgba(248, 249, 250, 0.1);
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
 ul.toc li {
-    margin: 5px 0;
+    margin: 8px 0;
+    font-size: 16px;
 }
 
 ul.toc a {
     color: #87ceeb;
     text-decoration: none;
+    font-size: 16px;
 }
 
 ul.toc a:hover {
@@ -338,7 +359,7 @@ ul.toc a:hover {
     margin-top: 20px;
     cursor: pointer;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     color: white;
     font-weight: bold;
     font-family: 'Segoe UI', sans-serif;
@@ -347,9 +368,100 @@ ul.toc a:hover {
 
 .editor-btn:hover {
     background: #8e44ad;
+    transform: translateY(-2px);
 }
 
-/* ==================== CONTAINER & LAYOUT (из оригинального style.css) ==================== */
+/* ==================== SECTION HEADER ==================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.section-title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.forward-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.forward-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    border-color: #fff;
+}
+
+/* ==================== TOOLBAR HEADER ==================== */
+.toolbar-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
+    border-color: #fff;
+}
+
+.toolbar-title {
+    color: #2c2c2c;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==================== CONTAINER & LAYOUT ==================== */
 .container {
     display: flex;
     gap: 20px;
@@ -364,7 +476,7 @@ ul.toc a:hover {
 .toolbar {
     width: 320px;
     min-width: 280px;
-    background: rgba(155, 142, 162, 0.9);
+    background: rgba(155, 142, 162, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -426,14 +538,14 @@ ul.toc a:hover {
     font-weight: bold;
     margin-bottom: 12px;
     font-size: 14px;
-    color: #ffff;
+    color: #fff;
 }
 
 .random-label {
     font-size: 12px;
     display: block;
     margin-bottom: 5px;
-    color: #ffff;
+    color: #fff;
 }
 
 .random-input {
@@ -510,7 +622,7 @@ ul.toc a:hover {
 /* ==================== CANVAS & POINTS ==================== */
 .canvas {
     flex: 1;
-    background: rgba(155, 142, 162, 0.9);
+    background: rgba(155, 142, 162, 0.95);
     backdrop-filter: blur(5px);
     border-radius: 8px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
@@ -739,48 +851,13 @@ ul.toc a:hover {
     .main-content {
         padding-top: 130px;
     }
-}
-/* Toolbar header with back button */
-.toolbar-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    .section-header {
+        flex-wrap: wrap;
+    }
 }
 
-.back-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: #fff;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-    line-height: 1;
-}
-
-.back-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateX(-2px);
-    border-color: #fff;
-}
-
-.toolbar-title {
-    color: #2c2c2c;
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+@media (max-width: 480px) {
+    .section-header {
+        flex-wrap: wrap;
+    }
 }

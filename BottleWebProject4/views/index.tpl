@@ -64,19 +64,23 @@
         </div>
 
         <!-- Вкладка Floyd-Warshall -->
-        <section id="floyd" class="tab-content">
-            <div class="content-text">
-                <button onclick="window.location.href='/floyd'" class="editor-btn">Open Floyd-Warshall Editor</button>
-                <h1>Алгоритм Флойда–Уоршелла</h1>
-                <div class="intro">
-                    <strong>Алгоритм Флойда</strong> (алгоритм Флойда–Уоршелла) — алгоритм нахождения длин кратчайших путей между всеми парами вершин во взвешенном ориентированном графе.
-                    Работает корректно, если в графе нет циклов отрицательной величины, а в случае, когда такой цикл есть, позволяет найти хотя бы один такой цикл.
-                    <br><br>
-                    <strong>Сложность:</strong>
-                    Время — <span class="complexity">Θ(n³)</span>,
-                    Память — <span class="complexity">Θ(n²)</span>.
-                    <br>Разработан в 1962 году.
-                </div>
+    <section id="floyd" class="tab-content">
+        <div class="content-text">
+            <!-- Заголовок с кнопкой перехода справа -->
+            <div class="section-header">
+                <h1 class="section-title">Алгоритм Флойда–Уоршелла</h1>
+                <a href="/floyd" class="forward-btn" title="Открыть редактор">></a>
+            </div>
+
+            <div class="intro">
+                <strong>Алгоритм Флойда</strong> (алгоритм Флойда–Уоршелла) — алгоритм нахождения длин кратчайших путей между всеми парами вершин во взвешенном ориентированном графе.
+                Работает корректно, если в графе нет циклов отрицательной величины, а в случае, когда такой цикл есть, позволяет найти хотя бы один такой цикл.
+                <br><br>
+                <strong>Сложность:</strong>
+                Время — <span class="complexity">Θ(n³)</span>,
+                Память — <span class="complexity">Θ(n²)</span>.
+                <br>Разработан в 1962 году.
+            </div>
 
                 <nav>
                     <h3>Содержание</h3>
