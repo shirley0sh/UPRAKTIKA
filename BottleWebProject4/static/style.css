@@ -99,26 +99,94 @@ body::before {
 
 /* ==================== MAIN CONTENT ==================== */
 .main-content {
+    position: relative;
     padding-top: 90px;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 40px;
     max-width: 1400px;
     margin: 0 auto;
+    min-height: 600px;
 }
 
+/* ==================== TAB CONTENT - АНИМАЦИИ ==================== */
 .tab-content {
     display: none;
-    width: 100%;
     background: rgba(155, 142, 162, 0.95);
     border-radius: 8px;
     padding: 30px;
     color: #fff;
-    min-height: 500px;
+    animation-duration: 0.35s;
+    animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    animation-fill-mode: both;
 }
 
 .tab-content.active {
     display: block;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+}
+
+@keyframes fadeOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+.tab-content.animate-in-right {
+    animation-name: fadeInRight;
+    display: block;
+}
+
+.tab-content.animate-in-left {
+    animation-name: fadeInLeft;
+    display: block;
+}
+
+.tab-content.animate-out-right {
+    animation-name: fadeOutRight;
+    pointer-events: none;
+}
+
+.tab-content.animate-out-left {
+    animation-name: fadeOutLeft;
+    pointer-events: none;
 }
 
 /* ==================== FORMS & INPUTS ==================== */
@@ -261,7 +329,6 @@ pre code {
     font-size: 16px;
 }
 
-/* Увеличенный шрифт для формул */
 .formula {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(221, 221, 221, 0.3);
@@ -351,6 +418,160 @@ ul.toc a:hover {
     color: #a6e22e;
 }
 
+/* ==================== EDITOR BUTTON ==================== */
+.editor-btn {
+    background: #9b59b6;
+    padding: 12px 24px;
+    font-size: 16px;
+    margin-top: 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    transition: background 0.3s;
+}
+
+.editor-btn:hover {
+    background: #8e44ad;
+    transform: translateY(-2px);
+}
+
+/* ==================== SECTION HEADER ==================== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.section-title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.forward-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.forward-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+    border-color: #fff;
+}
+
+/* ==================== COMPARISON TABLE ==================== */
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.comparison-table th {
+    background: rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
+
+.comparison-table tr:hover td {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 20px 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .logo {
+        white-space: normal;
+        text-align: center;
+    }
+    .tabs {
+        justify-content: center;
+    }
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .main-content {
+        padding-top: 130px;
+    }
+    .section-header {
+        flex-wrap: wrap;
+    }
+    .tab-content {
+        padding: 20px;
+    }
+    .content-text {
+        font-size: 16px;
+    }
+    .content-text h2 {
+        font-size: 26px;
+    }
+    .content-text h3 {
+        font-size: 22px;
+    }
+    .formula {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header {
+        flex-wrap: wrap;
+    }
+    .tab-button {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}
+
+/* ==================== REDUCED MOTION ==================== */
+@media (prefers-reduced-motion: reduce) {
+    .tab-content {
+        animation: none !important;
+        transition: none !important;
+    }
+}
 /* ==================== EDITOR BUTTON ==================== */
 .editor-btn {
     background: #9b59b6;
@@ -853,6 +1074,11 @@ ul.toc a:hover {
     }
     .section-header {
         flex-wrap: wrap;
+    }
+    .tab-content {
+        left: 10px;
+        right: 10px;
+        padding: 20px;
     }
 }
 
