@@ -14,7 +14,6 @@
             min-height: 100vh;
         }
 
-        /* Контейнер с двухколоночной сеткой */
         .container {
             display: flex;
             gap: 24px;
@@ -23,7 +22,6 @@
             margin: 0 auto;
         }
 
-        /* Левая панель (toolbar) - делаем прозрачнее, без сплошного бежевого фона */
         .toolbar {
             flex: 1.2;
             background: rgba(255, 255, 248, 0.65);
@@ -36,7 +34,6 @@
             overflow-y: auto;
         }
 
-        /* Правая область: граф + результаты */
         .right-area {
 
             flex: 2;
@@ -46,7 +43,6 @@
             min-width: 480px;
         }
 
-        /* Канвас */
         .canvas {
             position: relative;
             background: #f8f9fc;
@@ -385,7 +381,7 @@
 </head>
 <body>
 <div class="container">
-    <!-- Левая панель (toolbar) -->
+    <!-- Левая панель -->
     <div id="toolbar" class="toolbar">
         <div class="nav-buttons">
             <a href="/" class="nav-btn">Главный редактор</a>
@@ -419,7 +415,7 @@
         <div class="error-message" id="error-message"></div>
     </div>
 
-    <!-- Правая область: канвас + результаты -->
+    <!-- канвас + результаты -->
     <div class="right-area">
         <div id="canvas" class="canvas">
             <svg id="lines-layer" class="lines-layer"></svg>

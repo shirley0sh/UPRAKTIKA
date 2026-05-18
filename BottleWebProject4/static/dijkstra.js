@@ -1,13 +1,12 @@
 // Клиентская логика для работы с графом и вызова Python алгоритма Дейкстры
 
-let verticesData = [];     // { id: number, x, y, dom, labelIndex }
-let edgesList = [];        // { fromId, toId, weight }
+let verticesData = [];
+let edgesList = [];
 let currentN = 4;
 let syncingFromMatrix = false;
 let syncingFromCanvas = false;
 let nextVertexId = 1;
 
-// DOM элементы
 const canvasDiv = document.getElementById('canvas');
 const linesSvg = document.getElementById('lines-layer');
 const pointsLayer = document.getElementById('points-layer');
@@ -15,7 +14,6 @@ const matrixContainer = document.getElementById('matrix-container');
 const weightMatrixTable = document.getElementById('weight-matrix');
 const resultsPanel = document.getElementById('results-panel');
 
-// Отрисовка всех линий и весов
 function redrawLinesAndLabels() {
     if (!linesSvg || !canvasDiv) return;
     const rect = canvasDiv.getBoundingClientRect();
@@ -55,7 +53,6 @@ function redrawLinesAndLabels() {
     }
 }
 
-// Обновить матрицу из графа
 function updateMatrixFromGraph() {
     if (syncingFromMatrix) return;
     syncingFromCanvas = true;
@@ -81,7 +78,6 @@ function updateMatrixFromGraph() {
     syncingFromCanvas = false;
 }
 
-// Обновить граф из матрицы (создать/обновить рёбра)
 function updateGraphFromMatrix() {
     if (syncingFromCanvas) return;
     syncingFromMatrix = true;
@@ -107,9 +103,11 @@ function updateGraphFromMatrix() {
     redrawLinesAndLabels();
     if (resultsPanel) resultsPanel.style.display = 'none';
     syncingFromMatrix = false;
+
+    // Синхронизируем с сервером после изменения графа
+    syncGraphToServer();
 }
 
-// Создать вершины на канвасе (по кругу)
 function createVerticesOnCanvas(n) {
     pointsLayer.innerHTML = '';
     verticesData = [];
@@ -126,7 +124,7 @@ function createVerticesOnCanvas(n) {
         const angle = angleStep * (idx - 1) - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
-        const pointId = nextVertexId++;
+        const pointId = idx; // Используем label как id для простоты
         const pointDiv = document.createElement('div');
         pointDiv.className = 'graph-point';
         pointDiv.textContent = idx;
@@ -156,6 +154,7 @@ function createVerticesOnCanvas(n) {
             if (vertex) {
                 vertex.x = newX + 21;
                 vertex.y = newY + 21;
+                updateVertexPosition(pointId, vertex.x, vertex.y);
             }
             redrawLinesAndLabels();
         });
@@ -174,7 +173,18 @@ function createVerticesOnCanvas(n) {
     redrawLinesAndLabels();
 }
 
-// Построить матрицу весов
+async function updateVertexPosition(vid, x, y) {
+    try {
+        await fetch(`/api/graph/vertex/${vid}/position`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x: x, y: y })
+        });
+    } catch (error) {
+        console.error('Error updating vertex position:', error);
+    }
+}
+
 function buildMatrixTable(n) {
     weightMatrixTable.innerHTML = '';
     const thead = document.createElement('thead');
@@ -280,7 +290,7 @@ function showError(msg) {
 }
 
 function getWeightMatrixFromDOM() {
-    const mat = [[]]; // 1-индексация, 0-й индекс пустой
+    const mat = [[]];
     for (let i = 1; i <= currentN; i++) {
         mat[i] = [];
         for (let j = 1; j <= currentN; j++) {
@@ -291,69 +301,117 @@ function getWeightMatrixFromDOM() {
     return mat;
 }
 
-// Вызов алгоритма Дейкстры через Python
-async function runDijkstra(matrix, start) {
-    const response = await fetch('/api/dijkstra', {
+// Синхронизация графа с сервером
+async function syncGraphToServer() {
+    // Строим данные для отправки на сервер в формате, который ожидает graph.from_dict()
+    const vertices = {};
+    for (let v of verticesData) {
+        vertices[v.id] = {
+            x: v.x,
+            y: v.y,
+            label_index: v.labelIndex
+        };
+    }
+
+    const edges = [];
+    for (let edge of edgesList) {
+        edges.push({
+            from: edge.fromId,
+            to: edge.toId,
+            distance: edge.weight
+        });
+    }
+
+    const graphData = {
+        vertices: vertices,
+        edges: edges,
+        next_id: nextVertexId
+    };
+
+    try {
+        await fetch('/api/graph/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(graphData)
+        });
+    } catch (error) {
+        console.error('Error syncing graph:', error);
+    }
+}
+
+// Вызов алгоритма Дейкстры на сервере
+async function runDijkstra(start) {
+    const response = await fetch('/api/dijkstra/calculate', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            matrix: matrix,
-            start: start
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: start })
     });
 
     if (!response.ok) {
-        throw new Error('Ошибка при вызове алгоритма');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Ошибка сервера');
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    return data;
 }
 
-function displayResults(start, dist, paths) {
+// Отображение результатов
+function displayResults(start, responseData) {
     if (!resultsPanel) return;
-    const n = dist.length;
+
+    const results = responseData.results;
+    if (!results || !Array.isArray(results)) {
+        showError('Неверный формат ответа от сервера');
+        console.error('Invalid response:', responseData);
+        return;
+    }
+
     const tbody = document.getElementById('distances-tbody');
     const pathDiv = document.getElementById('path-list');
     tbody.innerHTML = '';
     pathDiv.innerHTML = '';
 
-    for (let i = 1; i <= n; i++) {
+    for (let item of results) {
         const row = document.createElement('tr');
         const tdV = document.createElement('td');
         const tdD = document.createElement('td');
-        tdV.textContent = i;
-        if (dist[i - 1] === Infinity || dist[i - 1] === null) {
+        tdV.textContent = item.vertex;
+
+        if (item.distance === null || item.distance === Infinity || item.distance === undefined) {
             tdD.textContent = '∞ (недостижима)';
             tdD.classList.add('unreachable');
         } else {
-            tdD.textContent = dist[i - 1];
+            tdD.textContent = item.distance;
         }
-        row.appendChild(tdV); row.appendChild(tdD);
+        row.appendChild(tdV);
+        row.appendChild(tdD);
         tbody.appendChild(row);
+
+        const pathItem = document.createElement('div');
+        pathItem.className = 'path-item';
+
+        if (item.vertex === start) {
+            pathItem.textContent = `Путь до вершины ${item.vertex}: ${item.vertex} (стартовая), длина = 0`;
+        } else if (item.distance === null || item.distance === Infinity || item.distance === undefined) {
+            pathItem.innerHTML = `<span class="unreachable">Вершина ${item.vertex} недостижима из стартовой ${start}</span>`;
+        } else {
+            const path = item.path || [];
+            const pathStr = path.length > 0 ? path.join(' → ') : String(item.vertex);
+            pathItem.textContent = `Путь до ${item.vertex}: ${pathStr} (длина = ${item.distance})`;
+        }
+        pathDiv.appendChild(pathItem);
     }
 
-    for (let i = 1; i <= n; i++) {
-        const item = document.createElement('div');
-        item.className = 'path-item';
-        if (i === start) {
-            item.textContent = `Путь до вершины ${i}: ${i} (стартовая), длина = 0`;
-        } else if (dist[i - 1] === Infinity || dist[i - 1] === null) {
-            item.innerHTML = `<span class="unreachable">Вершина ${i} недостижима из стартовой ${start}</span>`;
-        } else {
-            const path = paths[i];
-            if (path && path.length > 0) {
-                item.textContent = `Путь до ${i}: ${path.join(' → ')}  (длина = ${dist[i - 1]})`;
-            } else {
-                item.textContent = `Путь до ${i}: ${i}  (длина = ${dist[i - 1]})`;
-            }
-        }
-        pathDiv.appendChild(item);
-    }
     resultsPanel.style.display = 'block';
 }
 
+// Обработчики событий
 document.getElementById('generate-matrix-btn').addEventListener('click', () => {
     initGraphAndMatrix();
 });
@@ -363,13 +421,16 @@ document.getElementById('calculate-btn').addEventListener('click', async () => {
     if (err) { showError(err); return; }
     const startVal = parseInt(document.getElementById('start-vertex-select').value);
     if (!startVal) { showError('Выберите стартовую вершину'); return; }
-    const matrix = getWeightMatrixFromDOM();
 
     try {
-        const result = await runDijkstra(matrix, startVal);
-        displayResults(startVal, result.dist, result.paths);
+        // Сначала синхронизируем текущий граф с сервером
+        await syncGraphToServer();
+        // Затем вызываем алгоритм
+        const result = await runDijkstra(startVal);
+        displayResults(startVal, result);
     } catch (error) {
         showError('Ошибка при вычислении: ' + error.message);
+        console.error('Dijkstra error:', error);
     }
 });
 
