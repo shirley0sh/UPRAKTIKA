@@ -70,7 +70,7 @@ def calculate_paths(matrix, start):
         path = get_path(result['prev'], start, v)
         paths[v] = path
     output = {
-        'dist': result['dist'][1:],  # убираем нулевой элемент
+        'dist': result['dist'][1:],
         'prev': result['prev'][1:],
         'paths': paths
     }
