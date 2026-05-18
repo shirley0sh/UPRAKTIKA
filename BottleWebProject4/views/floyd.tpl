@@ -5,90 +5,99 @@
     <title>Graph Editor - Floyd-Warshall</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
-        /* Стили для шапки тулбара */
+        .toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Шапка тулбара */
         .toolbar-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 0;
-            border-bottom: none;
+            margin-bottom: 5px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .toolbar h3 {
-            border-bottom: none;
-            padding-bottom: 0;
-            margin-bottom: 0;
-            color: #fff; /* Исправил цвет на белый для контраста с темным тулбаром */
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        /* Кнопка назад (<) */
         .back-btn {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.4);
             color: #fff;
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            cursor: pointer;
             transition: all 0.2s ease;
-            flex-shrink: 0;
-            line-height: 1;
         }
 
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateX(-2px);
-            border-color: #fff;
         }
 
-        /* --- ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ КНОПКИ ДОБАВЛЕНИЯ ТОЧКИ --- */
+        .toolbar-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Круглая кнопка добавления вершины */
+        .vertex-creator {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
         .draggable-point {
-            background: rgba(187, 195, 208, 0.9); /* Цвет как у точки на холсте */
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            color: #2c2c2c;
-            width: 60px;       /* Фиксированная ширина */
-            height: 60px;      /* Фиксированная высота */
-            border-radius: 50%; /* Делает её круглой */
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #6e5d73 0%, #5a4d5e 100%);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;   /* Крупный плюс */
+            font-size: 36px;
             font-weight: bold;
+            color: white;
             cursor: grab;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 15px auto;
             transition: all 0.2s ease;
-            margin: 0 auto 20px auto; /* Центрируем кнопку в тулбаре */
-            padding: 0;        /* Убираем лишние отступы */
-            text-align: center;
-            line-height: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .draggable-point:hover {
-            background: #ffffff;
-            transform: scale(1.1); /* Увеличение при наведении */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #7d6d83 0%, #6e5d73 100%);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
 
         .draggable-point:active {
             cursor: grabbing;
-            transform: scale(0.95);
+            transform: scale(0.98);
         }
 
-        /* Панель генерации (оставил как было, но привел к общему стилю) */
+        .drag-hint {
+            text-align: center;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: -10px;
+            margin-bottom: 15px;
+        }
+
+        /* Панель генерации случайных расстояний */
         .random-panel {
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
             padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .random-title {
@@ -96,88 +105,211 @@
             margin-bottom: 12px;
             font-size: 14px;
             color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .random-label {
-            font-size: 12px;
+        .random-title::before {
+            content: "";
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
             display: block;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 5px;
-            color: #fff;
         }
 
         .random-input {
             width: 100%;
-            padding: 8px 10px;
-            margin-bottom: 12px;
-            box-sizing: border-box;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .btn-generate {
-            background-color: #5a4d5e;
-            color: white;
-            padding: 10px;
-            width: 100%;
-            border-radius: 6px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.9);
             border: none;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
         }
 
-        .btn-generate:hover {
-            background-color: #6e5d73;
+        .random-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.5);
         }
 
-        /* Стили для остальных кнопок, чтобы они не конфликтовали */
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-row .input-group {
+            flex: 1;
+        }
+
+        /* Кнопки управления */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
         .btn {
             padding: 12px;
-            width: 100%;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s ease;
             border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            font-family: 'Segoe UI', sans-serif;
-            margin-bottom: 10px;
-            background-color: #5a4d5e;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
         }
-        .btn:hover {
-            background-color: #6e5d73;
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
             transform: translateY(-1px);
         }
+
+        .btn-danger {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: rgba(231, 76, 60, 0.5);
+            color: white;
+        }
+
+        /* Информационный блок */
+        .info-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .info-panel h4 {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-panel p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .info-panel .shortcut {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        .floyd-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+            position: relative;
+            padding-left: 16px;
+        }
+   /* Стиль для заголовка-ссылки на теорию */
+        .floyd-title-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .floyd-title-link:hover {
+            background: rgba(155, 89, 182, 0.3);
+            transform: translateX(2px);
+        }
+
+
     </style>
 </head>
 <body>
     <div class="container">
         <div id="toolbar" class="toolbar">
-
-            <!-- Шапка с кнопкой < и заголовком -->
-            <div class="toolbar-header">
-                <a href="/" class="back-btn" title="Back to Home"><</a>
-                <h3>Floyd-Warshall Algorithm</h3>
+                       <div class="toolbar-header">
+                <a href="/" class="back-btn" title="На главную"><</a>
+                <a href="/" onclick="localStorage.setItem('activeTab', 'floyd');" class="floyd-title-link" title="Перейти к теоретическому описанию алгоритма Флойда">
+                    Алгоритм Флойда–Уоршелла
+                </a>
             </div>
 
-            <!-- Круглая кнопка добавления точки (теперь выглядит как вершина) -->
-            <div id="point-drag" class="draggable-point" draggable="true" title="Перетащите на холст, чтобы создать вершину">+</div>
+            <!-- Создание вершины -->
+            <div class="vertex-creator">
+                <div id="point-drag" class="draggable-point" draggable="true" title="Перетащите на холст">+</div>
+                <div class="drag-hint">Перетащите на холст</div>
+            </div>
 
-            <!-- Панель генерации случайных расстояний -->
+            <!-- Генерация случайных расстояний -->
             <div class="random-panel">
-                <div class="random-title">Random Distance Generator</div>
-                <label class="random-label">Min value:</label>
-                <input type="number" id="random-min" class="random-input" value="50" step="1">
-                <label class="random-label">Max value:</label>
-                <input type="number" id="random-max" class="random-input" value="500" step="1">
-                <button id="random-btn" class="btn-generate">Generate Random Distances</button>
+                <div class="random-title">Случайные веса рёбер</div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Мин.</label>
+                        <input type="number" id="random-min" class="random-input" value="50" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label>Макс.</label>
+                        <input type="number" id="random-max" class="random-input" value="500" step="1">
+                    </div>
+                </div>
+                <button id="random-btn" class="btn btn-secondary" style="width: 100%; margin-top: 5px;">Сгенерировать</button>
             </div>
 
-            <!-- Кнопки управления -->
-            <button id="clear-graph-btn" class="btn">Clear Graph</button>
-            <button id="floyd-btn" class="btn">Compute Shortest Paths</button>
+            <!-- Кнопки действий -->
+            <div class="action-buttons">
+                <button id="floyd-btn" class="btn btn-primary">Вычислить кратчайшие пути</button>
+                <button id="clear-graph-btn" class="btn btn-danger">Очистить граф</button>
+            </div>
+
+            <!-- Информационный блок -->
+            <div class="info-panel">
+                <h4>О алгоритме</h4>
+                <p>Флойда–Уоршелла находит кратчайшие пути между всеми парами вершин.</p>
+                <p><strong>Сложность:</strong> O(n³)</p>
+                <p><span class="shortcut">Совет:</span> Дважды кликните по ребру, чтобы задать вес</p>
+            </div>
         </div>
 
         <div id="canvas" class="canvas">

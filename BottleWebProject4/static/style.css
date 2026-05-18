@@ -1087,3 +1087,297 @@ hr {
         flex-wrap: wrap;
     }
 }
+/* ==================== СТИЛИ ДЛЯ ВКЛАДКИ КОНТАКТЫ И ФИДБЕК ==================== */
+
+/* Контейнер с двумя колонками */
+.contacts-feedback-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin: 30px 0;
+    align-items: stretch;
+}
+
+.contacts-column,
+.feedback-column {
+    flex: 1;
+    min-width: 280px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 30px 25px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Левая колонка - контакты */
+.contacts-column {
+    justify-content: flex-start;
+}
+
+.contacts-column h2 {
+    font-size: 26px;
+    margin-bottom: 25px;
+    color: #fff;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 12px;
+    text-align: left;
+}
+
+.contacts-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.contacts-list li {
+    margin-bottom: 22px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+}
+
+.contacts-list li:last-child {
+    border-bottom: none;
+}
+
+.contacts-list strong {
+    display: block;
+    font-size: 18px;
+    color: #c9b3e0;
+    margin-bottom: 8px;
+}
+
+.contacts-list a,
+.contacts-list span {
+    font-size: 18px;
+    color: #fff;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.contacts-list a:hover {
+    color: #87ceeb;
+    text-decoration: underline;
+}
+
+/* Правая колонка - форма обратной связи */
+.feedback-column {
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.feedback-column h2 {
+    font-size: 26px;
+    margin-bottom: 25px;
+    color: #fff;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 12px;
+    text-align: center;
+    width: 100%;
+}
+
+.feedback-form {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.feedback-form .form-group {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.feedback-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #e0d4f0;
+    text-align: center;
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+    width: 100%;
+    max-width: 450px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    display: block;
+    margin: 0 auto;
+}
+
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+    outline: none;
+    border-color: #9b59b6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+}
+
+.feedback-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.feedback-form select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a4d5e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 18px;
+}
+
+/* Кнопка */
+.btn-send {
+    background: rgba(255, 243, 205, 0.2);
+    border: 1px solid rgba(255, 234, 167, 0.5);
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    width: auto;
+    min-width: 200px;
+    transition: all 0.3s ease;
+    margin: 10px auto 0;
+    text-align: center;
+    display: block;
+}
+
+.btn-send:hover {
+    background: rgba(255, 243, 205, 0.35);
+    transform: translateY(-2px);
+}
+
+.btn-send:active {
+    transform: translateY(0);
+}
+
+/* Карточка разработчика */
+.developer-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    border-left: 4px solid #9b59b6;
+}
+
+.developer-name {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+.developer-role {
+    font-size: 16px;
+    color: #c9b3e0;
+    line-height: 1.4;
+}
+
+/* Блок примечания */
+.note {
+    background: rgba(255, 243, 205, 0.2);
+    border: 1px solid rgba(255, 234, 167, 0.3);
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin: 25px 0;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Блок поддержки */
+.support-block {
+    background: rgba(255, 243, 205, 0.15);
+    border: 1px solid rgba(255, 234, 167, 0.25);
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-top: 25px;
+    text-align: center;
+}
+
+.support-block h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.support-block p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.support-list {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.support-list li {
+    font-size: 16px;
+    color: #fff;
+}
+
+.support-list a {
+    color: #87ceeb;
+    text-decoration: none;
+}
+
+.support-list a:hover {
+    text-decoration: underline;
+}
+
+/* Разделитель */
+.custom-hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    margin: 30px 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .contacts-feedback-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .contacts-column,
+    .feedback-column {
+        padding: 22px 18px;
+    }
+
+    .contacts-column h2,
+    .feedback-column h2 {
+        font-size: 22px;
+    }
+
+    .feedback-form {
+        max-width: 100%;
+    }
+
+    .feedback-form input,
+    .feedback-form select,
+    .feedback-form textarea {
+        max-width: 100%;
+    }
+
+    .btn-send {
+        width: 100%;
+        min-width: auto;
+    }
+}
