@@ -1,3 +1,6 @@
+// Флаг для предотвращения двойной инициализации
+let isFloydInitialized = false;
+
 // Функция генерации случайных расстояний для страницы Флойда
 async function generateRandomDistancesFloyd() {
     const minInput = document.getElementById('random-min');
@@ -5,7 +8,7 @@ async function generateRandomDistancesFloyd() {
 
     if (!minInput || !maxInput) {
         console.error('Input elements not found');
-        alert('Error: Input elements not found');
+        alert('Ошибка: элементы ввода не найдены');
         return;
     }
 
@@ -13,22 +16,22 @@ async function generateRandomDistancesFloyd() {
     let max = parseInt(maxInput.value);
 
     if (isNaN(min)) {
-        alert('Please enter a valid minimum value');
+        alert('Введите корректное минимальное значение');
         minInput.focus();
         return;
     }
     if (isNaN(max)) {
-        alert('Please enter a valid maximum value');
+        alert('Введите корректное максимальное значение');
         maxInput.focus();
         return;
     }
     if (min >= max) {
-        alert('Minimum must be less than maximum');
+        alert('Минимум должен быть меньше максимума');
         minInput.focus();
         return;
     }
     if (min < 0 || max < 0) {
-        alert('Values cannot be negative');
+        alert('Значения не могут быть отрицательными');
         return;
     }
 
@@ -48,95 +51,158 @@ async function generateRandomDistancesFloyd() {
 
             if (graphData.edges) {
                 window.lineConnections = graphData.edges;
-                redrawLines();
+                if (typeof redrawLines === 'function') {
+                    redrawLines();
+                }
             }
 
-            alert(`Random distances assigned to ${data.count} line(s)!`);
+            alert(`Случайные расстояния присвоены ${data.count} ребру(ам)!`);
         }
 
     } catch (error) {
         console.error('Error generating random distances:', error);
-        alert('Error generating random distances');
+        alert('Ошибка генерации случайных расстояний');
     }
 }
 
 // Функция очистки графа для страницы Флойда
 async function clearGraphFloyd() {
-    if (!confirm('Clear all points and lines?')) return;
+    if (!confirm('Очистить все точки и линии?')) return;
 
-    points.forEach(p => {
-        if (p.element) p.element.remove();
-    });
-        points = [];
-        window.lineConnections = [];
-        selectedPointId = null;
-        selectedLine = null;
-
-        await fetch('/api/graph/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ vertices: {}, edges: [] })
+    // Очищаем точки из DOM
+    if (points && points.length) {
+        points.forEach(p => {
+            if (p.element && p.element.parentNode) {
+                p.element.remove();
+            }
         });
+    }
 
+    points = [];
+    window.lineConnections = [];
+    selectedPointId = null;
+    selectedLine = null;
+
+    // Очищаем SVG линии
+    if (linesSvg) {
+        linesSvg.innerHTML = '';
+    }
+    lines = [];
+
+    await fetch('/api/graph/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vertices: {}, edges: [] })
+    });
+
+    if (typeof redrawAll === 'function') {
         redrawAll();
+    }
 }
 
-// Инициализация редактора Флойда
+// Инициализация редактора Флойда (только один раз)
 function initFloydEditor() {
+    // Защита от двойной инициализации
+    if (isFloydInitialized) {
+        console.log('Floyd editor already initialized, skipping...');
+        return;
+    }
+
+    // Проверяем, что мы на странице Флойда
+    if (window.location.pathname !== '/floyd') {
+        console.log('Not on Floyd page, skipping init');
+        return;
+    }
+
+    isFloydInitialized = true;
     console.log('Initializing Floyd editor...');
 
-    // Используем стандартные ID (как в script.js)
+    // Получаем DOM элементы
+    const canvas = document.getElementById('canvas');
     pointsLayer = document.getElementById('points-layer');
     linesSvg = document.getElementById('lines-layer');
     draggable = document.getElementById('point-drag');
 
-    // Переопределяем глобальные переменные
-    window.pointsLayer = pointsLayer;
-    window.linesSvg = linesSvg;
-    window.draggable = draggable;
+    if (!pointsLayer || !linesSvg) {
+        console.error('Required DOM elements not found');
+        return;
+    }
 
-    // Настройка Drag & Drop
+    // Очищаем слой точек (чтобы не было дублей)
+    pointsLayer.innerHTML = '';
+
+    // Очищаем глобальные массивы
+    if (typeof points !== 'undefined' && points.length) {
+        points = [];
+    }
+    if (typeof window.lineConnections !== 'undefined') {
+        window.lineConnections = [];
+    }
+    if (typeof lines !== 'undefined') {
+        lines = [];
+    }
+    selectedPointId = null;
+    selectedLine = null;
+
+    // Настройка Drag & Drop для перетаскивания кнопки
     if (draggable) {
+        // Удаляем старый обработчик через клон
+        const newDraggable = draggable.cloneNode(true);
+        draggable.parentNode.replaceChild(newDraggable, draggable);
+        draggable = newDraggable;
+
         draggable.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', 'point');
         });
     }
 
-    if (pointsLayer) {
-        pointsLayer.addEventListener('dragover', (e) => e.preventDefault());
+    // Настройка слоя точек
+    pointsLayer.addEventListener('dragover', (e) => e.preventDefault());
 
-        pointsLayer.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const rect = pointsLayer.getBoundingClientRect();
-            addPoint(e.clientX - rect.left, e.clientY - rect.top);
-        });
+    pointsLayer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const rect = pointsLayer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        if (typeof addPoint === 'function') {
+            addPoint(x, y);
+        }
+    });
 
-        pointsLayer.addEventListener('dblclick', (e) => {
-            const target = e.target;
-            if (target.classList && target.classList.contains('point')) {
-                removePoint(parseInt(target.dataset.id));
+    pointsLayer.addEventListener('dblclick', (e) => {
+        const target = e.target;
+        if (target.classList && target.classList.contains('point')) {
+            const id = parseInt(target.dataset.id);
+            if (typeof removePoint === 'function') {
+                removePoint(id);
             }
-        });
+        }
+    });
 
-        pointsLayer.addEventListener('click', () => {
+    pointsLayer.addEventListener('click', () => {
+        if (typeof clearSelectedPoints === 'function') {
             clearSelectedPoints();
-            if (selectedLine) {
+        }
+        if (selectedLine) {
+            if (selectedLine.style) {
                 selectedLine.style.stroke = '#bdc2ce';
-                selectedLine = null;
             }
-        });
+            selectedLine = null;
+        }
+    });
+
+    // Настройка SVG слоя для линий
+    linesSvg.style.pointerEvents = 'none';
+
+    // Загружаем граф с сервера
+    if (typeof loadGraph === 'function') {
+        loadGraph();
     }
 
-    // Загружаем граф
-    loadGraph();
-
-    // Назначаем обработчики кнопок (стандартные ID из floyd.tpl)
+    // Назначаем обработчики кнопок
     const randomBtn = document.getElementById('random-btn');
     if (randomBtn) {
         randomBtn.onclick = generateRandomDistancesFloyd;
-        console.log('Random button handler assigned');
-    } else {
-        console.error('random-btn not found');
     }
 
     const clearBtn = document.getElementById('clear-graph-btn');
@@ -157,7 +223,7 @@ async function showFloydWarshall() {
         const data = await response.json();
 
         if (!data.vertices || data.vertices.length === 0) {
-            alert('No vertices in graph. Add some points first.');
+            alert('Нет вершин в графе. Добавьте несколько точек.');
             return;
         }
 
@@ -183,7 +249,7 @@ async function showFloydWarshall() {
         content.style.boxShadow = '0 10px 40px rgba(0,0,0,0.3)';
 
         const title = document.createElement('h2');
-        title.textContent = 'Floyd-Warshall Algorithm Results';
+        title.textContent = 'Результаты алгоритма Флойда–Уоршелла';
         title.style.textAlign = 'center';
         title.style.marginBottom = '20px';
         title.style.color = '#5a4d5e';
@@ -195,7 +261,7 @@ async function showFloydWarshall() {
         tabContainer.style.marginBottom = '20px';
 
         const distTab = document.createElement('button');
-        distTab.textContent = 'Distance Matrix';
+        distTab.textContent = 'Матрица расстояний';
         distTab.style.padding = '10px 20px';
         distTab.style.backgroundColor = '#5a4d5e';
         distTab.style.color = 'white';
@@ -205,7 +271,7 @@ async function showFloydWarshall() {
         distTab.style.fontWeight = 'bold';
 
         const pathTab = document.createElement('button');
-        pathTab.textContent = 'Path Matrix';
+        pathTab.textContent = 'Матрица путей';
         pathTab.style.padding = '10px 20px';
         pathTab.style.backgroundColor = '#e8d7cf';
         pathTab.style.color = '#5a4d5e';
@@ -238,7 +304,7 @@ async function showFloydWarshall() {
             const headerRow = document.createElement('tr');
 
             const cornerTh = document.createElement('th');
-            cornerTh.textContent = 'From\\To';
+            cornerTh.textContent = 'Из\\В';
             cornerTh.style.border = '1px solid #e8d7cf';
             cornerTh.style.padding = '10px';
             cornerTh.style.backgroundColor = '#e8d7cf';
@@ -310,11 +376,11 @@ async function showFloydWarshall() {
             legend.style.borderRadius = '8px';
             legend.style.fontSize = '12px';
             legend.innerHTML = `
-            <strong>Legend:</strong><br>
-            🟢 Green: Short distance (< 100)<br>
-            🟠 Orange: Medium distance (100-500)<br>
-            🔴 Red: Long distance (> 500)<br>
-            ∞: No path exists
+            <strong>Легенда:</strong><br>
+            🟢 Зеленый: короткое расстояние (&lt; 100)<br>
+            🟠 Оранжевый: среднее расстояние (100-500)<br>
+            🔴 Красный: длинное расстояние (&gt; 500)<br>
+            ∞: путь отсутствует
             `;
             tableContainer.appendChild(legend);
         }
@@ -337,7 +403,7 @@ async function showFloydWarshall() {
             const headerRow = document.createElement('tr');
 
             const cornerTh = document.createElement('th');
-            cornerTh.textContent = 'From\\To';
+            cornerTh.textContent = 'Из\\В';
             cornerTh.style.border = '1px solid #e8d7cf';
             cornerTh.style.padding = '10px';
             cornerTh.style.backgroundColor = '#e8d7cf';
@@ -382,7 +448,7 @@ async function showFloydWarshall() {
                         cell.textContent = '-';
                         cell.style.backgroundColor = '#f5f5f5';
                     } else if (dist === null || dist === Infinity || !path || path.length === 0) {
-                        cell.textContent = 'No path';
+                        cell.textContent = 'Нет пути';
                         cell.style.color = '#999';
                         cell.style.backgroundColor = '#f9f9f9';
                     } else {
@@ -391,9 +457,9 @@ async function showFloydWarshall() {
                         cell.style.color = '#1565c0';
                         cell.style.cursor = 'pointer';
                         cell.style.fontWeight = '500';
-                        cell.title = `Distance: ${dist.toFixed(2)}`;
+                        cell.title = `Расстояние: ${dist.toFixed(2)}`;
                         cell.onclick = () => {
-                            alert(`Shortest path from ${vertices[i]} to ${vertices[j]}:\n\n${path.join(' → ')}\n\nTotal distance: ${dist.toFixed(2)}`);
+                            alert(`Кратчайший путь из ${vertices[i]} в ${vertices[j]}:\n\n${path.join(' → ')}\n\nОбщее расстояние: ${dist.toFixed(2)}`);
                         };
                     }
                     row.appendChild(cell);
@@ -409,7 +475,7 @@ async function showFloydWarshall() {
             info.style.backgroundColor = '#e3f2fd';
             info.style.borderRadius = '8px';
             info.style.fontSize = '12px';
-            info.innerHTML = '💡 <strong>Tip:</strong> Click on any path to see detailed information.';
+            info.innerHTML = '💡 <strong>Совет:</strong> Нажмите на любой путь, чтобы увидеть детальную информацию.';
             tableContainer.appendChild(info);
         }
 
@@ -432,7 +498,7 @@ async function showFloydWarshall() {
         };
 
         const closeBtn = document.createElement('button');
-        closeBtn.textContent = 'Close';
+        closeBtn.textContent = 'Закрыть';
         closeBtn.style.marginTop = '20px';
         closeBtn.style.padding = '12px 20px';
         closeBtn.style.backgroundColor = '#5a4d5e';
@@ -451,13 +517,19 @@ async function showFloydWarshall() {
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Error computing shortest paths');
+        alert('Ошибка вычисления кратчайших путей');
     }
 }
 
-// Автоматический запуск инициализации при загрузке страницы
+// Инициализация при загрузке страницы (только для /floyd)
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFloydEditor);
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.location.pathname === '/floyd') {
+            setTimeout(initFloydEditor, 100);
+        }
+    });
 } else {
-    initFloydEditor();
+    if (window.location.pathname === '/floyd') {
+        setTimeout(initFloydEditor, 100);
+    }
 }

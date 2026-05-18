@@ -604,7 +604,14 @@ function setupDragAndDrop() {
 }
 
 // Инициализация главного редактора
+// Инициализация главного редактора
 function initGraphEditor() {
+    // Проверяем, не страница ли это Флойда (чтобы не было двойной инициализации)
+    if (window.location.pathname === '/floyd') {
+        console.log('Floyd page detected, skipping main editor init');
+        return;
+    }
+
     console.log('Initializing main graph editor...');
 
     // Переопределяем DOM элементы

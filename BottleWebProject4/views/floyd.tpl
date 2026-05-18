@@ -5,19 +5,21 @@
     <title>Graph Editor - Floyd-Warshall</title>
     <link rel="stylesheet" href="/static/style.css">
     <style>
+        /* Переопределение отступов в тулбаре */
         .toolbar {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
+            padding: 20px;
         }
 
         /* Шапка тулбара */
         .toolbar-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 5px;
-            padding-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 0;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -25,14 +27,14 @@
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.4);
             color: #fff;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             transition: all 0.2s ease;
         }
@@ -42,41 +44,54 @@
             transform: translateX(-2px);
         }
 
-        .toolbar-header h3 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 600;
+        /* Стиль для заголовка-ссылки на теорию */
+        .floyd-title-link {
             color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .floyd-title-link:hover {
+            background: rgba(155, 89, 182, 0.3);
+            transform: translateX(2px);
         }
 
         /* Круглая кнопка добавления вершины */
         .vertex-creator {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .draggable-point {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #6e5d73 0%, #5a4d5e 100%);
+            width: 60px;
+            height: 60px;
+            background: #5a4d5e;
             border: 2px solid rgba(255, 255, 255, 0.6);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 32px;
             font-weight: bold;
             color: white;
             cursor: grab;
-            margin: 0 auto 15px auto;
+            margin: 0 auto 8px auto;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .draggable-point:hover {
             transform: scale(1.05);
-            background: linear-gradient(135deg, #7d6d83 0%, #6e5d73 100%);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            background: #6e5d73;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .draggable-point:active {
@@ -86,53 +101,48 @@
 
         .drag-hint {
             text-align: center;
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: -10px;
-            margin-bottom: 15px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: -5px;
+            margin-bottom: 10px;
         }
 
         /* Панель генерации случайных расстояний */
         .random-panel {
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 5px;
         }
 
         .random-title {
             font-weight: bold;
-            margin-bottom: 12px;
-            font-size: 14px;
+            margin-bottom: 10px;
+            font-size: 13px;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .random-title::before {
-            content: "";
-            font-size: 16px;
+            gap: 6px;
         }
 
         .input-group {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .input-group label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .random-input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: rgba(255, 255, 255, 0.9);
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 13px;
             box-sizing: border-box;
         }
 
@@ -143,133 +153,102 @@
 
         .input-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
 
         .input-row .input-group {
             flex: 1;
         }
 
-        /* Кнопки управления */
+        /* Кнопки управления - единый цвет */
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin: 10px 0;
+            gap: 8px;
+            margin: 5px 0;
         }
 
         .btn {
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
             text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            background: #5a4d5e;
             color: white;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.25);
+        .btn:hover {
+            background: #6e5d73;
             transform: translateY(-1px);
         }
 
+        .btn-primary {
+            background: #5a4d5e;
+        }
+
+        .btn-primary:hover {
+            background: #6e5d73;
+        }
+
+        .btn-secondary {
+            background: #5a4d5e;
+        }
+
+        .btn-secondary:hover {
+            background: #6e5d73;
+        }
+
         .btn-danger {
-            background: rgba(231, 76, 60, 0.3);
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            color: #e74c3c;
+            background: #5a4d5e;
         }
 
         .btn-danger:hover {
-            background: rgba(231, 76, 60, 0.5);
-            color: white;
+            background: #6e5d73;
         }
 
         /* Информационный блок */
         .info-panel {
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 15px;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
         }
 
         .info-panel h4 {
-            font-size: 13px;
+            font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .info-panel p {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.6);
-            line-height: 1.5;
-            margin-bottom: 8px;
+            line-height: 1.4;
+            margin-bottom: 5px;
         }
 
         .info-panel .shortcut {
             display: inline-block;
             background: rgba(255, 255, 255, 0.1);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
             font-family: monospace;
-            font-size: 11px;
+            font-size: 10px;
         }
-
-        .floyd-title {
-            font-size: 22px;
-            font-weight: 600;
-            color: #fff;
-            margin: 0;
-            position: relative;
-            padding-left: 16px;
-        }
-   /* Стиль для заголовка-ссылки на теорию */
-        .floyd-title-link {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 8px;
-            border-radius: 8px;
-        }
-
-        .floyd-title-link:hover {
-            background: rgba(155, 89, 182, 0.3);
-            transform: translateX(2px);
-        }
-
-
     </style>
 </head>
 <body>
     <div class="container">
         <div id="toolbar" class="toolbar">
-                       <div class="toolbar-header">
-                <a href="/" class="back-btn" title="На главную"><</a>
+            <div class="toolbar-header">
+                <a href="/" class="back-btn" title="На главную">←</a>
                 <a href="/" onclick="localStorage.setItem('activeTab', 'floyd');" class="floyd-title-link" title="Перейти к теоретическому описанию алгоритма Флойда">
                     Алгоритм Флойда–Уоршелла
                 </a>
@@ -278,12 +257,12 @@
             <!-- Создание вершины -->
             <div class="vertex-creator">
                 <div id="point-drag" class="draggable-point" draggable="true" title="Перетащите на холст">+</div>
-                <div class="drag-hint">Перетащите на холст</div>
+                <div class="drag-hint">📌 Перетащите на холст</div>
             </div>
 
             <!-- Генерация случайных расстояний -->
             <div class="random-panel">
-                <div class="random-title">Случайные веса рёбер</div>
+                <div class="random-title">🎲 Случайные веса рёбер</div>
                 <div class="input-row">
                     <div class="input-group">
                         <label>Мин.</label>
@@ -299,16 +278,16 @@
 
             <!-- Кнопки действий -->
             <div class="action-buttons">
-                <button id="floyd-btn" class="btn btn-primary">Вычислить кратчайшие пути</button>
-                <button id="clear-graph-btn" class="btn btn-danger">Очистить граф</button>
+                <button id="floyd-btn" class="btn btn-primary">🔍 Вычислить кратчайшие пути</button>
+                <button id="clear-graph-btn" class="btn btn-danger">🗑 Очистить граф</button>
             </div>
 
             <!-- Информационный блок -->
             <div class="info-panel">
-                <h4>О алгоритме</h4>
+                <h4>ℹ️ О алгоритме</h4>
                 <p>Флойда–Уоршелла находит кратчайшие пути между всеми парами вершин.</p>
                 <p><strong>Сложность:</strong> O(n³)</p>
-                <p><span class="shortcut">Совет:</span> Дважды кликните по ребру, чтобы задать вес</p>
+                <p><span class="shortcut">💡 Совет:</span> Дважды кликните по ребру, чтобы задать вес</p>
             </div>
         </div>
 
