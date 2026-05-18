@@ -14,7 +14,6 @@
             min-height: 100vh;
         }
 
-        /* Контейнер с двухколоночной сеткой */
         .container {
             display: flex;
             gap: 24px;
@@ -23,33 +22,40 @@
             margin: 0 auto;
         }
 
-        /* Левая панель (toolbar) - делаем прозрачнее, без сплошного бежевого фона */
         .toolbar {
-            flex: 1.2;
+            flex: 1;
             background: rgba(255, 255, 248, 0.65);
             border-radius: 20px;
             padding: 20px;
             backdrop-filter: blur(6px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             height: fit-content;
+            width: fit-content;
             max-height: 90vh;
             overflow-y: auto;
+    
         }
 
-        /* Правая область: граф + результаты */
+        .h3 {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: flex-start;
+        }
+
+
         .right-area {
 
-            flex: 2;
+            flex: 1.7;
             display: flex;
             flex-direction: column;
             gap: 20px;
             min-width: 480px;
         }
 
-        /* Канвас */
         .canvas {
             position: relative;
-            background: #f8f9fc;
+            background: rgba(255, 255, 248, 0.65);
             border-radius: 16px;
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
@@ -204,6 +210,7 @@
             padding: 10px;
             background: rgba(187, 195, 208, 0.9);
             border-radius: 10px;
+
         }
 
         .nav-btn {
@@ -385,11 +392,11 @@
 </head>
 <body>
 <div class="container">
-    <!-- Левая панель (toolbar) -->
+    <!-- Левая панель -->
     <div id="toolbar" class="toolbar">
         <div class="nav-buttons">
-            <a href="/" class="nav-btn">Главный редактор</a>
-            <a href="/floyd" class="nav-btn">Флойд-Уоршелл</a>
+            <a href="/" class="nav-btn">Главная страница</a>
+            <a href="/#dijkstra" class="nav-btn">Теория</a>
             <a href="/dijkstra" class="nav-btn" style="background: #94899c;">Дейкстра</a>
         </div>
         <h3>Алгоритм Дейкстры</h3>
@@ -419,7 +426,7 @@
         <div class="error-message" id="error-message"></div>
     </div>
 
-    <!-- Правая область: канвас + результаты -->
+    <!-- канвас + результаты -->
     <div class="right-area">
         <div id="canvas" class="canvas">
             <svg id="lines-layer" class="lines-layer"></svg>

@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import json
-import sys
 
 def dijkstra(matrix, start):
     """
@@ -12,7 +12,7 @@ def dijkstra(matrix, start):
     Returns:
         dict: {'dist': [список расстояний], 'prev': [список предыдущих вершин]}
     """
-    n = len(matrix) - 1  # размерность матрицы (1-индексация)
+    n = len(matrix) - 1
     dist = [float('inf')] * (n + 1)
     visited = [False] * (n + 1)
     prev = [None] * (n + 1)
@@ -20,7 +20,6 @@ def dijkstra(matrix, start):
     dist[start] = 0
     
     for _ in range(n):
-        # Находим непосещенную вершину с минимальным расстоянием
         min_dist = float('inf')
         u = -1
         for v in range(1, n + 1):
@@ -28,12 +27,11 @@ def dijkstra(matrix, start):
                 min_dist = dist[v]
                 u = v
         
-        if u == -1:  # Все оставшиеся вершины недостижимы
+        if u == -1:
             break
         
         visited[u] = True
         
-        # Релаксируем ребра из вершины u
         for v in range(1, n + 1):
             if not visited[v] and matrix[u][v] > 0 and dist[u] != float('inf'):
                 new_dist = dist[u] + matrix[u][v]
@@ -48,17 +46,7 @@ def dijkstra(matrix, start):
 
 
 def get_path(prev, start, end):
-    """
-    Восстановление пути из prev
-    
-    Args:
-        prev: список предыдущих вершин
-        start: int, стартовая вершина
-        end: int, конечная вершина
-    
-    Returns:
-        list: путь от start до end или None если пути нет
-    """
+    """Восстановление пути из prev"""
     if prev[end] is None and start != end:
         return None
     
@@ -73,26 +61,17 @@ def get_path(prev, start, end):
     return path
 
 
-if __name__ == "__main__":
-    # Получаем данные из stdin
-    data = json.loads(sys.stdin.read())
-    matrix = data['matrix']
-    start = data['start']
-    
-    # Запускаем алгоритм
+def calculate_paths(matrix, start):
+    """Вычисление всех кратчайших путей"""
     result = dijkstra(matrix, start)
-    
-    # Формируем пути для всех вершин
     paths = {}
     n = len(matrix) - 1
     for v in range(1, n + 1):
         path = get_path(result['prev'], start, v)
         paths[v] = path
-    
-    # Выводим результат
     output = {
-        'dist': result['dist'][1:],  # убираем 0-й индекс
+        'dist': result['dist'][1:],
         'prev': result['prev'][1:],
         'paths': paths
     }
-    print(json.dumps(output))
+    return output
