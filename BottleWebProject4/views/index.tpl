@@ -1,391 +1,76 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Graphix - Graph Theory</title>
-    <style>
-        * {
-            margin: 1;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 0;
-            margin: 0;
-            background-image: url('/static/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-
-        /* Фиксированная шапка */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: 2px;
-            white-space: nowrap;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .tab-button {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            font-size: 15px;
-            color: #fff;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .tab-button:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-        }
-
-        .tab-button.active {
-            border-bottom-color: #fff;
-            font-weight: bold;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px 4px 0 0;
-        }
-
-        /* Основной контент с отступом для фиксированной шапки */
-        .main-content {
-            padding-top: 90px;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-bottom: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            background: rgba(155, 142, 162, 0.95);
-            border-radius: 8px;
-            padding: 30px;
-            color: #fff;
-            min-height: 500px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        input, textarea {
-            width: 100%;
-            max-width: 500px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 4px;
-        }
-
-        textarea {
-            min-height: 120px;
-        }
-
-        button {
-            padding: 8px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid #fff;
-            cursor: pointer;
-            color: #fff;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .tab-content h2, .tab-content p, .tab-content ul, .tab-content li {
-            color: #fff;
-        }
-
-        .tab-content a {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-        .content-text {
-            line-height: 1.6;
-            font-size: 16px;
-        }
-
-        .content-text h2 {
-            margin-bottom: 15px;
-            font-size: 28px;
-            color: #fff;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .content-text h3 {
-            margin-bottom: 10px;
-            margin-top: 20px;
-            font-size: 22px;
-            color: #fff;
-        }
-
-        .content-text p {
-            margin-bottom: 15px;
-        }
-
-        .content-text ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        .content-text li {
-            margin-bottom: 8px;
-        }
-
-        /* Стили для теории */
-        .intro {
-            background: rgba(248, 249, 250, 0.2);
-            padding: 15px;
-            border-left: 4px solid #3498db;
-            border-radius: 0 4px 4px 0;
-            margin: 20px 0;
-        }
-
-        .complexity {
-            display: inline-block;
-            background: rgba(232, 244, 248, 0.3);
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-family: monospace;
-            font-weight: bold;
-        }
-
-        pre {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9em;
-            margin: 15px 0;
-        }
-
-        code {
-            font-family: 'Consolas', 'Monaco', monospace;
-            background: rgba(241, 241, 241, 0.2);
-            padding: 2px 6px;
-            border-radius: 3px;
-        }
-
-        pre code {
-            background: none;
-            padding: 0;
-        }
-
-        .formula {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(221, 221, 221, 0.3);
-            padding: 10px 15px;
-            margin: 10px 0;
-            border-radius: 4px;
-            font-family: 'Times New Roman', serif;
-            font-style: italic;
-            text-align: center;
-        }
-
-        .matrix {
-            font-family: monospace;
-            white-space: pre;
-            text-align: center;
-            margin: 10px 0;
-            background: rgba(248, 249, 250, 0.1);
-            padding: 10px;
-            border-radius: 4px;
-        }
-
-        .note {
-            background: rgba(255, 243, 205, 0.2);
-            border: 1px solid rgba(255, 234, 167, 0.3);
-            padding: 10px 15px;
-            border-radius: 4px;
-            margin: 10px 0;
-        }
-
-        .proof {
-            border-left: 3px solid #9b59b6;
-            padding-left: 15px;
-            margin: 15px 0;
-            font-style: italic;
-        }
-
-        ul.toc {
-            list-style: none;
-            padding-left: 0;
-            background: rgba(248, 249, 250, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-        }
-        ul.toc li { margin: 5px 0; }
-        ul.toc a {
-            color: #87ceeb;
-            text-decoration: none;
-        }
-        ul.toc a:hover { text-decoration: underline; }
-
-        .keyword { color: #f92672; font-weight: bold; }
-        .function { color: #66d9ef; }
-        .comment { color: #75715e; font-style: italic; }
-        .string { color: #a6e22e; }
-
-        .editor-btn {
-            background: #9b59b6;
-            padding: 12px 24px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-        }
-        .editor-btn:hover {
-            background: #8e44ad;
-        }
-
-        /* Адаптация для мобильных */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                align-items: center;
-            }
-            .logo {
-                white-space: normal;
-                text-align: center;
-            }
-            .tabs {
-                justify-content: center;
-            }
-            .tab-button {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-            .main-content {
-                padding-top: 130px;
-            }
-        }
-    </style>
+    <!-- Подключение внешнего CSS-файла -->
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <!-- Фиксированная шапка с логотипом и табами -->
-    <div class="header">
+    <!-- Шапка с табами -->
+    <header class="header">
         <div class="header-content">
             <div class="logo">Graphix</div>
-            <div class="tabs">
+            <nav class="tabs">
                 <button class="tab-button active" data-tab="home">Home</button>
-                <button class="tab-button" data-tab="floyd">Floyd-Warshall</button>
+                <button class="tab-button" data-tab="floyd">Флойда</button>
                 <button class="tab-button" data-tab="dijkstra">Dijkstra</button>
                 <button class="tab-button" data-tab="prim">Алгоритм Прима</button>
                 <button class="tab-button" data-tab="kruskal">Kruskal</button>
                 <button class="tab-button" data-tab="about">About</button>
                 <button class="tab-button" data-tab="contacts">Contacts</button>
                 <button class="tab-button" data-tab="feedback">Feedback</button>
-            </div>
+            </nav>
         </div>
-    </div>
+    </header>
 
     <!-- Основной контент -->
     <div class="main-content">
+
         <!-- Вкладка Home -->
         <div id="home" class="tab-content active">
             <div class="content-text">
-                <h2>Welcome to Graphix</h2>
-                <p>Graphix is a powerful graph theory visualization tool that allows you to create, edit, and analyze graphs using various algorithms.</p>
+                <h2>Добро пожаловать в Graphix</h2>
+                <p>Graphix — это мощный инструмент визуализации теории графов, который позволяет создавать, редактировать и анализировать графы с помощью различных алгоритмов.</p>
 
-                <h3>Available Algorithms:</h3>
+                <h3>Доступные алгоритмы:</h3>
                 <ul>
-                    <li><strong>Floyd-Warshall</strong> - Finds shortest paths between all pairs of vertices</li>
-                    <li><strong>Dijkstra</strong> - Finds shortest paths from a single source vertex</li>
-                    <li><strong>Алгоритм Прима</strong> - Используется для нахождения кратчайшего остова</li>
-                    <li><strong>Kruskal</strong> - Finds Minimum Spanning Tree (Coming Soon)</li>
+                    <li><strong>Флойд–Уоршелл</strong> — находит кратчайшие пути между всеми парами вершин</li>
+                    <li><strong>Дейкстра</strong> — находит кратчайшие пути от одной исходной вершины</li>
+                    <li><strong>Алгоритм Прима</strong> — используется для нахождения минимального остовного дерева</li>
+                    <li><strong>Краскал</strong> — находит минимальное остовное дерево (скоро)</li>
                 </ul>
 
-                <h3>How to use the Graph Editor:</h3>
+                <h3>Как использовать редактор графов:</h3>
                 <ul>
-                    <li>Go to any algorithm tab to access the interactive graph editor</li>
-                    <li>Drag "Add Point" button to canvas to create vertices</li>
-                    <li>Click on a vertex, then click on another to create an edge</li>
-                    <li>Double-click on an edge to set custom distance</li>
-                    <li>Drag vertices to move them</li>
-                    <li>Click on an edge and press Delete to remove it</li>
-                    <li>Double-click on a vertex to delete it</li>
-                    <li>Use Random Distance Generator to assign random weights to all edges</li>
+                    <li>Перейдите на вкладку любого алгоритма, чтобы открыть интерактивный редактор графов</li>
+                    <li>Перетащите кнопку «Добавить точку» на холст, чтобы создать вершины</li>
+                    <li>Нажмите на одну вершину, затем на другую, чтобы создать ребро</li>
+                    <li>Дважды нажмите на ребро, чтобы задать пользовательское расстояние</li>
+                    <li>Перетаскивайте вершины, чтобы перемещать их</li>
+                    <li>Нажмите на ребро и затем на клавишу Delete, чтобы удалить его</li>
+                    <li>Дважды нажмите на вершину, чтобы удалить её</li>
+                    <li>Используйте генератор случайных расстояний, чтобы назначить случайные веса всем рёбрам</li>
                 </ul>
 
-                <h3>Features:</h3>
+                <h3>Возможности:</h3>
                 <ul>
-                    <li>Interactive graph editor with drag-and-drop interface</li>
-                    <li>Real-time visualization</li>
-                    <li>Random distance generation</li>
-                    <li>Shortest path visualization</li>
+                    <li>Интерактивный редактор графов с интерфейсом перетаскивания</li>
+                    <li>Визуализация в реальном времени</li>
+                    <li>Генерация случайных расстояний</li>
+                    <li>Визуализация кратчайшего пути</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Вкладка Floyd-Warshall с теорией -->
+        <!-- Вкладка Floyd-Warshall -->
         <div id="floyd" class="tab-content">
             <div class="content-text">
-                <button onclick="window.location.href='/floyd'" class="editor-btn">Open Floyd-Warshall Editor</button>
-
-                <h1>Алгоритм Флойда–Уоршелла</h1>
+                <div class="section-header">
+                    <h1 class="section-title">Алгоритм Флойда–Уоршелла</h1>
+                    <a href="/floyd" class="forward-btn" title="Открыть редактор">></a>
+                </div>
 
                 <div class="intro">
                     <strong>Алгоритм Флойда</strong> (алгоритм Флойда–Уоршелла) — алгоритм нахождения длин кратчайших путей между всеми парами вершин во взвешенном ориентированном графе.
@@ -413,11 +98,9 @@
 
                 <h2 id="problem">1. Постановка задачи</h2>
                 <p>Дан взвешенный ориентированный граф <code>G(V, E)</code>, в котором вершины пронумерованы от <code>1</code> до <code>n</code>.</p>
-
                 <div class="formula">
                     ω<sub>uv</sub> = { weight(u→v), если (u→v) ∈ E; +∞, если (u→v) ∉ E }
                 </div>
-
                 <p><strong>Требуется:</strong> найти матрицу кратчайших расстояний <code>d</code>, где элемент <code>d<sub>ij</sub></code> равен:</p>
                 <ul>
                     <li>длине кратчайшего пути из <code>i</code> в <code>j</code>, или</li>
@@ -426,17 +109,10 @@
 
                 <h2 id="description">2. Описание алгоритма</h2>
                 <p>Обозначим длину кратчайшего пути между вершинами <code>u</code> и <code>v</code>, содержащего только вершины из множества <code>{1..i}</code> как <code>d<sup>(i)</sup><sub>uv</sub></code>, где <code>d<sup>(0)</sup><sub>uv</sub> = ω<sub>uv</sub></code>.</p>
-
                 <p><strong>Рекуррентное соотношение:</strong></p>
                 <div class="formula">
                     d<sup>(i)</sup><sub>uv</sub> = min( d<sup>(i-1)</sup><sub>uv</sub>, d<sup>(i-1)</sup><sub>ui</sub> + d<sup>(i-1)</sup><sub>iv</sub> )
                 </div>
-
-                <p><strong>Логика:</strong></p>
-                <ul>
-                    <li>Если кратчайший путь из <code>u</code> в <code>v</code> проходит через вершину <code>i</code> → объединяем пути <code>u→i</code> и <code>i→v</code></li>
-                    <li>Если не проходит → берём значение с предыдущей итерации</li>
-                </ul>
 
                 <h2 id="code-basic">3. Код (базовая версия)</h2>
                 <pre><code><span class="comment">// Инициализация</span>
@@ -459,7 +135,6 @@
 
                 <h2 id="code-optimal">4. Код (оптимизированный)</h2>
                 <p>Можно использовать <strong>двумерный массив</strong>, обновляя значения "на месте":</p>
-
                 <pre><code><span class="function">func</span> <span class="function">floyd</span>(ω):
     <span class="comment">// Инициализация: d = ω</span>
     d = copy(ω)
@@ -473,8 +148,6 @@
 
     <span class="keyword">return</span> d</code></pre>
 
-                <p><strong>Сложность:</strong> <span class="complexity">Θ(n³)</span> времени, <span class="complexity">Θ(n²)</span> памяти.</p>
-
                 <h2 id="example">5. Пример работы</h2>
                 <p>Исходная матрица весов (<code>∞</code> — нет ребра):</p>
                 <div class="matrix">
@@ -484,42 +157,10 @@
                 [ ∞   1   ∞   × ]
                 </div>
 
-                <p><strong>После итераций:</strong></p>
-                <div class="matrix">
-                k=0 → k=1 → k=2 → k=3<br><br>
-                [ ×  ∞  ∞  ∞ ]   [ ×  ∞  ∞  ∞ ]   [ ×  ∞  ∞  ∞ ]   [ ×  ∞  ∞  ∞ ]<br>
-                [ 1  ×  ∞  ∞ ] → [ 1  ×  ∞  ∞ ] → [ 1  ×  ∞  ∞ ] → [ 1  ×  ∞  ∞ ]<br>
-                [ 6  4  ×  1 ]   [ 5  4  ×  1 ]   [ 5  4  ×  1 ]   [ 3  2  ×  1 ]<br>
-                [ ∞  1  ∞  × ]   [ 2  1  ∞  × ]   [ 2  1  ∞  × ]   [ 2  1  ∞  × ]
-                </div>
-
                 <h2 id="path-reconstruction">6. Восстановление кратчайшего пути</h2>
-                <p>Добавим массив <code>next[u][v]</code> — следующая вершина на пути из <code>u</code> в <code>v</code>.</p>
-
-                <pre><code><span class="function">func</span> <span class="function">floyd_with_path</span>(ω):
-    d = copy(ω)
-    next = [[None]*n <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(n)]
-
-    <span class="comment">// Инициализация next</span>
-    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
-        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(n):
-            <span class="keyword">if</span> ω[i][j] < ∞ <span class="keyword">and</span> i != j:
-                next[i][j] = j
-
-    <span class="comment">// Основной алгоритм</span>
-    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="function">range</span>(n):
-        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
-            <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(n):
-                <span class="keyword">if</span> d[i][k] + d[k][j] < d[i][j]:
-                    d[i][j] = d[i][k] + d[k][j]
-                    next[i][j] = next[i][k]
-
-    <span class="keyword">return</span> d, next
-
-<span class="function">func</span> <span class="function">get_path</span>(u, v, next):
+                <pre><code><span class="function">func</span> <span class="function">get_path</span>(u, v, next):
     <span class="keyword">if</span> d[u][v] == ∞:
         <span class="keyword">return</span> <span class="string">"No path"</span>
-
     path = [u]
     <span class="keyword">while</span> u != v:
         u = next[u][v]
@@ -527,95 +168,371 @@
         path.append(u)
     <span class="keyword">return</span> path</code></pre>
 
-                <h2 id="negative-cycle">7. Поиск отрицательного цикла</h2>
-                <div class="proof">
-                    <strong>Утверждение:</strong> При наличии цикла отрицательного веса на главной диагонали матрицы <code>d</code> появятся отрицательные числа: <code>d[i][i] &lt; 0</code>.
-                </div>
-
-                <pre><code><span class="comment">// После выполнения алгоритма Флойда:</span>
-<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
-    <span class="keyword">if</span> d[i][i] < 0:
-        print(<span class="string">f"Отрицательный цикл через вершину {i}"</span>)</code></pre>
-
-                <div class="note">
-                    <strong>Важно:</strong> При наличии отрицательных циклов расстояния могут уменьшаться неограниченно. Рекомендуется ограничивать вычисления снизу значением <code>-INF</code>.
-                </div>
-
-                <h2 id="transitive-closure">8. Построение транзитивного замыкания</h2>
-                <p>Задача: найти все пары вершин <code>(x, y)</code>, между которыми существует путь.</p>
-
-                <h3>Псевдокод</h3>
-                <pre><code><span class="comment">// W[i][j] = 1, если есть ребро (i→j), иначе 0</span>
-<span class="keyword">for</span> k <span class="keyword">in</span> <span class="function">range</span>(n):
-    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(n):
-        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="function">range</span>(n):
-            W[i][j] = W[i][j] <span class="keyword">or</span> (W[i][k] <span class="keyword">and</span> W[k][j])</code></pre>
-
                 <hr>
-
                 <div class="intro">
                     <strong>Источники:</strong>
                     <ul style="margin: 10px 0 0 0; padding-left: 20px;">
                         <li>Cormen T., Leiserson C., Rivest R. — "Алгоритмы: построение и анализ"</li>
                         <li>Floyd R.W. (1962). "Algorithm 97: Shortest Path". Communications of the ACM</li>
-                        <li>Warshall S. (1962). "A theorem on Boolean matrices". Journal of the ACM</li>
                     </ul>
                 </div>
             </div>
         </div>
+	
+	
+<!-- Вкладка Краскала — только содержимое .tab-content -->
+    <div id="kruskal" class="tab-content active">
+    <div class="content-text">
+        <!-- Заголовок с кнопкой перехода в редактор -->
+        <div class="section-header">
+            <h1 class="section-title">Алгоритм Краскала</h1>
+            <a href="/kruskal" class="forward-btn" title="Открыть редактор">></a>
+        </div>
+
+        <!-- Вступление -->
+        <div class="intro">
+            <strong>Алгоритм Краскала</strong> (также алгоритм Крускала) — эффективный алгоритм построения минимального остовного дерева взвешенного связного неориентированного графа. Также применяется для нахождения некоторых приближённых решений задачи Штейнера.
+            <br><br>
+            Алгоритм был описан Джозефом Краскалом в 1956 году. Он практически не отличается от более раннего алгоритма Борувки, предложенного Отакаром Борувкой ещё в 1926 году.
+            <br><br>
+            <strong>Сложность:</strong>
+            Время — <span class="complexity">O(|E|·log|E|)</span> (сортировка рёбер + DSU),
+            Память — <span class="complexity">O(|V| + |E|)</span>.
+        </div>
+
+        <!-- Содержание -->
+        <nav>
+            <h3>Содержание</h3>
+            <ul class="toc">
+                <li><a href="#kruskal-formulation">1. Формулировка алгоритма</a></li>
+                <li><a href="#kruskal-complexity">2. Оценка сложности</a></li>
+                <li><a href="#kruskal-proof">3. Доказательство корректности</a></li>
+                <li><a href="#kruskal-example">4. Пример работы</a></li>
+                <li><a href="#kruskal-code">5. Реализация на псевдокоде</a></li>
+                <li><a href="#kruskal-comparison">6. Сравнение с алгоритмом Прима</a></li>
+                <li><a href="#kruskal-applications">7. Области применения</a></li>
+            </ul>
+        </nav>
+
+        <!-- Раздел 1 - Формулировка (исправленные отступы) -->
+        <h2 id="kruskal-formulation">1. Формулировка алгоритма</h2>
+        <p>В начале работы текущее множество выбранных рёбер устанавливается пустым. Затем, пока это возможно, выполняется следующая операция:</p>
+        <ol style="margin-left: 25px; margin-bottom: 15px;">
+            <li style="margin-bottom: 8px;">Из всех рёбер, добавление которых к уже имеющемуся множеству <strong>не вызовет появления цикла</strong>, выбирается ребро с минимальным весом.</li>
+            <li style="margin-bottom: 8px;">Выбранное ребро добавляется к текущему множеству.</li>
+            <li style="margin-bottom: 8px;">Когда рёбер, удовлетворяющих условию, больше не остаётся, алгоритм завершается.</li>
+        </ol>
+        <p>Подграф исходного графа, содержащий все его вершины и найденное множество рёбер, является <strong>остовным деревом минимального веса</strong>.</p>
+        
+        <div class="note">
+            <strong>Ключевая идея:</strong> жадно добавлять рёбра в порядке возрастания веса, пропуская те, которые создают циклы.
+        </div>
+
+        <!-- Раздел 2 -->
+        <h2 id="kruskal-complexity">2. Оценка сложности</h2>
+        <ul style="margin-left: 25px; margin-bottom: 15px;">
+            <li style="margin-bottom: 8px;"><strong>Сортировка рёбер:</strong> перед началом работы рёбра необходимо отсортировать по весу. Это требует <var>O(E × log E)</var> времени.</li>
+            <li style="margin-bottom: 8px;"><strong>Хранение компонент связности:</strong> удобно использовать систему непересекающихся множеств (DSU).</li>
+            <li style="margin-bottom: 8px;"><strong>Обработка рёбер:</strong> все операции объединения и поиска займут <var>O(E × α(E, V))</var>, где <var>α</var> — функция, обратная функции Аккермана.</li>
+            <li style="margin-bottom: 8px;">Поскольку для любых практических размеров графов <var>α(E, V) &lt; 5</var>, её можно считать константой.</li>
+        </ul>
+        <p>Таким образом, общее время работы алгоритма Краскала оценивается как <code>O(E × log E)</code>.</p>
+
+        <div class="formula">
+            T(Kruskal) = O(|E|·log|E|) + O(|E|·α(|V|)) ≈ O(|E|·log|E|)
+        </div>
+
+        <!-- Раздел 3 -->
+        <h2 id="kruskal-proof">3. Доказательство корректности</h2>
+        <p>Алгоритм Краскала действительно находит остовное дерево минимального веса, так как он является частным случаем <strong>алгоритма Радо — Эдмондса</strong> для графического матроида. В данном контексте независимыми множествами выступают ациклические множества рёбер.</p>
+        <div class="proof">
+            <strong>Краткое доказательство:</strong> Пусть алгоритм выбрал рёбра e₁, e₂, ..., e_{n-1} в порядке возрастания веса. Предположим, существует минимальное остовное дерево T*, отличное от построенного. Рассмотрим первое ребро eᵢ, которое есть в построенном дереве, но отсутствует в T*. Замена даст дерево не большего веса — противоречие.
+        </div>
+
+        <!-- Раздел 4 - Пример работы -->
+        <h2 id="kruskal-example">4. Пример работы</h2>
+        <p>Рассмотрим граф из 7 вершин (A, B, C, D, E, F, G):</p>
+        
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 1.</strong> Рёбра <code>AD (5)</code> и <code>CE (5)</code> имеют минимальный вес. Выбираем <code>AD (5)</code>. Множество: <code>{A, D}</code>.
+        </div>
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 2.</strong> Выбираем <code>CE (5)</code>. Множество: <code>{C, E}</code>.
+        </div>
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 3.</strong> Выбираем <code>DF (6)</code>. Множество: <code>{A, D, F}</code>.
+        </div>
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 4.</strong> Выбираем <code>AB (7)</code>. Множество: <code>{A, B, D, F}</code>.
+        </div>
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 5.</strong> Выбираем <code>BE (7)</code>. Объединяем множества: <code>{A, B, C, D, E, F}</code>.
+        </div>
+        <div class="note" style="margin-bottom: 12px;">
+            <strong>Шаг 6.</strong> Добавляем <code>EG (9)</code>. Минимальное остовное дерево построено.
+        </div>
+
+        <div class="intro">
+            <strong>Примечание:</strong> Визуальное представление шагов будет доступно в интерактивном редакторе.
+        </div>
+
+        <!-- Раздел 5 - Реализация -->
+        <h2 id="kruskal-code">5. Реализация на псевдокоде</h2>
+        <pre><code><span class="keyword">function</span> <span class="function">kruskal</span>(graph):
+    <span class="comment">// 1. Сортировка всех рёбер по весу</span>
+    edges = sort(graph.edges, key=weight)
+    
+    <span class="comment">// 2. Инициализация DSU</span>
+    dsu = DisjointSetUnion(graph.vertices)
+    
+    <span class="comment">// 3. Построение MST</span>
+    mst = []
+    total_weight = 0
+    
+    <span class="keyword">for</span> edge <span class="keyword">in</span> edges:
+        <span class="keyword">if</span> dsu.find(edge.u) != dsu.find(edge.v):
+            dsu.union(edge.u, edge.v)
+            mst.append(edge)
+            total_weight += edge.weight
+            <span class="keyword">if</span> len(mst) == n - 1:
+                <span class="keyword">break</span>
+    
+    <span class="keyword">return</span> mst, total_weight</code></pre>
+
+        <!-- Раздел 6 - Сравнение -->
+        <h2 id="kruskal-comparison">6. Сравнение с алгоритмом Прима</h2>
+        <div class="matrix" style="text-align: left; white-space: normal; line-height: 1.8;">
+            <strong>Алгоритм Краскала:</strong> "Лес" — добавляет рёбра, объединяя деревья. DSU. O(|E|·log|E|). Лучше для разреженных графов.<br><br>
+            <strong>Алгоритм Прима:</strong> "Растущее дерево" — добавляет вершины. Куча. O(|E|·log|V|). Лучше для плотных графов.
+        </div>
+
+        <!-- Раздел 7 - Применения -->
+        <h2 id="kruskal-applications">7. Области применения</h2>
+        <ul style="margin-left: 25px; margin-bottom: 15px;">
+            <li style="margin-bottom: 8px;"><strong>Телекоммуникации:</strong> проектирование минимальных сетей связи.</li>
+            <li style="margin-bottom: 8px;"><strong>Транспорт:</strong> прокладка дорог, железнодорожных путей.</li>
+            <li style="margin-bottom: 8px;"><strong>Электроэнергетика:</strong> построение электрических сетей.</li>
+            <li style="margin-bottom: 8px;"><strong>Компьютерные сети:</strong> протоколы STP.</li>
+            <li style="margin-bottom: 8px;"><strong>Кластеризация:</strong> выделение связных компонент.</li>
+        </ul>
+
+        <!-- Футер -->
+        <hr>
+        <div class="intro">
+            <strong>Источники:</strong>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                <li>Kruskal J.B. (1956). "On the shortest spanning subtree of a graph"</li>
+                <li>Cormen T. и др. — "Алгоритмы: построение и анализ" (глава 23)</li>
+            </ul>
+        </div>
+    </div>
+
 
         <!-- Вкладка Dijkstra -->
         <div id="dijkstra" class="tab-content">
             <div class="content-text">
-                <h2>Dijkstra's Algorithm</h2>
-                <p>Click the button below to open the interactive graph editor with Dijkstra's algorithm.</p>
-                <p>Dijkstra's algorithm finds the shortest paths from a single source vertex to all other vertices.</p>
-                <button onclick="window.location.href='/dijkstra'" style="margin-top: 15px;">Open Dijkstra Editor →</button>
+                <div class="section-header">
+                    <h1 class="section-title">Алгоритм Дейкстры</h1>
+                    <a href="/dijkstra" class="forward-btn" title="Открыть редактор">></a>
+                </div>
+
+                <div class="intro">
+                    <strong>Алгоритм Дейкстры</strong> — алгоритм нахождения кратчайших путей от одной вершины до всех остальных во взвешенном графе с неотрицательными весами рёбер.
+                    <br><br>
+                    <strong>Сложность:</strong>
+                    Время — <span class="complexity">O(|E|·log|V|)</span> (с двоичной кучей),
+                    Память — <span class="complexity">O(|V| + |E|)</span>.
+                    <br>Разработан в 1959 году Эдсгером Дейкстрой.
+                </div>
+
+                <h2>Описание алгоритма</h2>
+                <p>Алгоритм работает следующим образом:</p>
+                <ul>
+                    <li>Начальной вершине присваивается расстояние 0, всем остальным — бесконечность</li>
+                    <li>На каждом шаге выбирается непосещённая вершина с наименьшим расстоянием</li>
+                    <li>Для выбранной вершины рассматриваются все соседние вершины и обновляются расстояния до них</li>
+                    <li>Алгоритм завершается, когда все вершины посещены</li>
+                </ul>
+
+                <pre><code><span class="function">func</span> <span class="function">dijkstra</span>(graph, start):
+    distances = [∞] * n
+    distances[start] = 0
+    visited = [False] * n
+
+    <span class="keyword">for</span> _ <span class="keyword">in</span> range(n):
+        u = <span class="function">find_min_unvisited</span>(distances, visited)
+        visited[u] = True
+
+        <span class="keyword">for</span> v, weight <span class="keyword">in</span> graph[u]:
+            <span class="keyword">if</span> <span class="keyword">not</span> visited[v]:
+                new_dist = distances[u] + weight
+                <span class="keyword">if</span> new_dist < distances[v]:
+                    distances[v] = new_dist
+
+    <span class="keyword">return</span> distances</code></pre>
+
+                <h2>Применение</h2>
+                <ul>
+                    <li>Навигационные системы (GPS)</li>
+                    <li>Маршрутизация в компьютерных сетях (OSPF)</li>
+                    <li>Поиск оптимальных путей в транспортных сетях</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Важно:</strong> Алгоритм Дейкстры не работает с рёбрами отрицательного веса. Для таких случаев используется алгоритм Беллмана-Форда.
+                </div>
             </div>
         </div>
 
-        <!-- Вкладка Алгоритм Прима -->
+        <!-- Вкладка Prim -->
         <div id="prim" class="tab-content">
             <div class="content-text">
-                <h2>Алгоритм Прима</h2>
-                <div class="algorithm-description">
-    <div class="description-header">
-        
-        <h3>Принцип работы алгоритма Прима</h3>
-    </div>
-    
-    <p><strong>Алгоритм Прима</strong> – метод построения минимального остовного дерева для связного взвешенного неориентированного графа. Остовное дерево соединяет все вершины графа без циклов и обладает минимальной суммой весов рёбер.</p>
-    
-    <div class="description-section">
-        <h4>Алгоритм пошагово</h4>
-        <ol>
-            <li>Выбрать произвольную начальную вершину и включить её в остовное дерево.</li>
-            <li>Из всех рёбер, соединяющих вершины дерева с вершинами вне дерева, выбрать ребро с минимальным весом.</li>
-            <li>Добавить выбранное ребро и новую вершину в дерево.</li>
-            <li>Повторять шаги 2-3, пока все вершины не окажутся в деревеd.</li>
-        </ol>
-    </div>
+                <div class="section-header">
+                    <h1 class="section-title">Алгоритм Прима</h1>
+                    <a href="/prim" class="forward-btn" title="Открыть редактор">></a>
+                </div>
 
-    <div class="description-section">
-        <h4>Область применения</h4>
-        <p>Проектирование сетей связи, прокладка дорог, создание электрических сетей, построение маршрутов в логистике – везде, где требуется связать все узлы с минимальными затратами.</p>
-    </div>
+                <div class="intro">
+                    <strong>Алгоритм Прима</strong> — алгоритм построения минимального остовного дерева (Minimum Spanning Tree, MST) для связного взвешенного неориентированного графа.
+                    Он находит подграф, который соединяет все вершины графа, не содержит циклов и имеет минимально возможную сумму весов рёбер.
+                    <br><br>
+                    <strong>Сложность:</strong>
+                    Время — <span class="complexity">O(|E|·log|V|)</span> (с бинарной кучей),
+                    Память — <span class="complexity">O(|V| + |E|)</span>.
+                    <br>Разработан в 1957 году Робертом Примом.
+                </div>
 
-    <div class="description-note">
-        <strong>Важно:</strong> алгоритм работает только для связных графов и всегда находит глобально оптимальное решение.
-    </div>
-</div>
-                <button disabled style="margin-top: 15px; opacity: 0.5;">Coming Soon</button>
+                <h2>Описание алгоритма</h2>
+                <p>Алгоритм Прима относится к классу <strong>жадных алгоритмов</strong>. На каждом шаге он добавляет к текущему дереву ребро минимального веса, соединяющее дерево с новой вершиной.</p>
+
+                <p><strong>Основная идея:</strong></p>
+                <ul>
+                    <li>Выбрать произвольную стартовую вершину <code>s</code> и включить её в дерево <code>T</code>.</li>
+                    <li>Поддерживать множество вершин <code>U</code>, уже включённых в дерево.</li>
+                    <li>На каждом шаге выбирать ребро <code>(u, v)</code> минимального веса, где <code>u ∈ U</code>, <code>v ∉ U</code>.</li>
+                    <li>Добавлять вершину <code>v</code> в <code>U</code>, а ребро <code>(u, v)</code> — в <code>T</code>.</li>
+                    <li>Повторять, пока <code>U ≠ V</code>.</li>
+                </ul>
+
+                <pre><code><span class="function">func</span> <span class="function">prim</span>(graph, n):
+    visited = [False] * n
+    key = [∞] * n
+    parent = [-1] * n
+    key[0] = 0
+
+    <span class="keyword">for</span> _ <span class="keyword">in</span> range(n):
+        u = <span class="function">find_min_key</span>(key, visited)
+        visited[u] = True
+
+        <span class="keyword">for</span> v <span class="keyword">in</span> range(n):
+            <span class="keyword">if</span> graph[u][v] != 0 <span class="keyword">and</span> <span class="keyword">not</span> visited[v] <span class="keyword">and</span> graph[u][v] < key[v]:
+                key[v] = graph[u][v]
+                parent[v] = u
+
+    <span class="keyword">return</span> parent, sum(key)</code></pre>
+
+                <h2>Сравнение с алгоритмом Краскала</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Характеристика</th>
+                            <th>Алгоритм Прима</th>
+                            <th>Алгоритм Краскала</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Подход</td>
+                            <td>"Растущее дерево" — добавляет вершины</td>
+                            <td>"Лес" — добавляет рёбра, объединяя деревья</td>
+                        </tr>
+                        <tr>
+                            <td>Структура данных</td>
+                            <td>Куча (приоритетная очередь)</td>
+                            <td>Система непересекающихся множеств (DSU)</td>
+                        </tr>
+                        <tr>
+                            <td>Сложность</td>
+                            <td>O(|E|·log|V|)</td>
+                            <td>O(|E|·log|E|)</td>
+                        </tr>
+                        <tr>
+                            <td>Когда лучше</td>
+                            <td>Плотные графы (|E| ≈ |V|²)</td>
+                            <td>Разреженные графы (|E| ≈ |V|)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Области применения</h2>
+                <ul>
+                    <li><strong>Телекоммуникации:</strong> проектирование минимальных сетей связи</li>
+                    <li><strong>Транспорт:</strong> прокладка дорог, железнодорожных путей</li>
+                    <li><strong>Электроэнергетика:</strong> построение электрических сетей минимальной стоимости</li>
+                    <li><strong>Компьютерные сети:</strong> протокол STP (Spanning Tree Protocol)</li>
+                </ul>
             </div>
         </div>
 
         <!-- Вкладка Kruskal -->
         <div id="kruskal" class="tab-content">
             <div class="content-text">
-                <h2>Kruskal's Algorithm</h2>
-                <p>Coming soon!</p>
-                <p>Kruskal's algorithm finds the Minimum Spanning Tree (MST) of a graph.</p>
-                <button disabled style="margin-top: 15px; opacity: 0.5;">Coming Soon</button>
+                <div class="section-header">
+                    <h1 class="section-title">Алгоритм Краскала</h1>
+                    <button class="forward-btn" disabled style="opacity:0.5; cursor:not-allowed;">></button>
+                </div>
+
+                <div class="intro">
+                    <strong>Алгоритм Краскала</strong> — алгоритм построения минимального остовного дерева (MST) для связного взвешенного неориентированного графа.
+                    В отличие от алгоритма Прима, он работает с рёбрами, сортируя их по весу и добавляя в MST, если они не создают цикл.
+                    <br><br>
+                    <strong>Сложность:</strong>
+                    Время — <span class="complexity">O(|E|·log|E|)</span> (сортировка рёбер),
+                    Память — <span class="complexity">O(|V| + |E|)</span>.
+                    <br>Разработан в 1956 году Джозефом Краскалом.
+                </div>
+
+                <div class="note" style="text-align: center; background: rgba(155, 142, 162, 0.5);">
+                    <strong>🚧 В разработке 🚧</strong><br>
+                    Редактор с визуализацией алгоритма Краскала появится в следующем обновлении!
+                </div>
+
+                <h2>Описание алгоритма</h2>
+                <p>Алгоритм Краскала следует жадной стратегии:</p>
+                <ul>
+                    <li>Отсортировать все рёбра графа по возрастанию веса</li>
+                    <li>Инициализировать лес, где каждая вершина — отдельное дерево</li>
+                    <li>Проходить по рёбрам в отсортированном порядке</li>
+                    <li>Если ребро соединяет вершины из разных деревьев — добавить его в MST</li>
+                    <li>Если вершины уже в одном дереве — пропустить ребро (иначе образуется цикл)</li>
+                    <li>Повторять, пока в MST не будет (|V|-1) рёбер</li>
+                </ul>
+
+                <pre><code><span class="function">func</span> <span class="function">kruskal</span>(edges, n):
+    <span class="comment">// Сортировка рёбер по весу</span>
+    sort(edges, key=<span class="keyword">lambda</span> e: e.weight)
+
+    dsu = <span class="function">DisjointSet</span>(n)  <span class="comment">// Система непересекающихся множеств</span>
+    mst = []
+    total_weight = 0
+
+    <span class="keyword">for</span> edge <span class="keyword">in</span> edges:
+        <span class="keyword">if</span> dsu.<span class="function">find</span>(edge.u) != dsu.<span class="function">find</span>(edge.v):
+            dsu.<span class="function">union</span>(edge.u, edge.v)
+            mst.append(edge)
+            total_weight += edge.weight
+
+            <span class="keyword">if</span> len(mst) == n - 1:
+                <span class="keyword">break</span>
+
+    <span class="keyword">return</span> mst, total_weight</code></pre>
+
+                <h2>Применение</h2>
+                <ul>
+                    <li>Проектирование сетей связи и электропередач</li>
+                    <li>Кластеризация данных</li>
+                    <li>Приближённое решение задачи коммивояжёра</li>
+                </ul>
             </div>
         </div>
 
@@ -623,21 +540,18 @@
         <div id="about" class="tab-content">
             <div class="content-text">
                 <h2>About Graphix</h2>
-                <p>Graphix is a graph theory visualization tool developed for educational purposes.</p>
-
-                <h3>Features:</h3>
-                <ul>
-                    <li>Interactive graph editor with drag-and-drop</li>
-                    <li>Floyd-Warshall algorithm (all-pairs shortest paths)</li>
-                    <li>Dijkstra algorithm (single-source shortest paths)</li>
-                    <li>Random distance generation</li>
-                    <li>Real-time visualization with SVG</li>
-                </ul>
-
+                <p>Educational graph theory visualization tool.</p>
                 <h3>Technologies:</h3>
                 <ul>
-                    <li>Backend: Python with Bottle framework</li>
-                    <li>Frontend: HTML5, CSS3, JavaScript, SVG</li>
+                    <li>Backend: Python + Bottle</li>
+                    <li>Frontend: HTML5, CSS3, Vanilla JS, SVG</li>
+                </ul>
+                <h3>Features:</h3>
+                <ul>
+                    <li>Interactive graph editor with drag & drop</li>
+                    <li>Real-time visualization of algorithms</li>
+                    <li>Step-by-step execution mode</li>
+                    <li>Random graph generation</li>
                 </ul>
             </div>
         </div>
@@ -648,58 +562,107 @@
                 <h2>Contacts</h2>
                 <p>Email: support@graphix.com</p>
                 <p>GitHub: github.com/graphix</p>
-                <p>Documentation: docs.graphix.com</p>
                 <p>Telegram: @graphix_support</p>
+                <p>Discord: discord.gg/graphix</p>
+                <p>Twitter: @graphix_app</p>
             </div>
         </div>
 
         <!-- Вкладка Feedback -->
         <div id="feedback" class="tab-content">
-            <h2>Feedback Form</h2>
-            <form action="/feedback" method="POST">
-                <div class="form-group">
-                    <label for="email">Your Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="question">Your Question / Feedback:</label>
-                    <textarea id="question" name="question" required></textarea>
-                </div>
-
-                <button type="submit">Send</button>
-            </form>
+            <div class="content-text">
+                <h2>Feedback Form</h2>
+                <form action="/feedback" method="POST">
+                    <div class="form-group">
+                        <label for="email">Your Email:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="question">Your Question / Feedback:</label>
+                        <textarea id="question" name="question" required placeholder="Tell us what you think..."></textarea>
+                    </div>
+                    <button type="submit">Send Feedback</button>
+                </form>
+            </div>
         </div>
+
     </div>
 
+    <!-- Скрипт переключения табов - ПЛАВНАЯ АНИМАЦИЯ -->
     <script>
-        var buttons = document.querySelectorAll('.tab-button');
-        var contents = document.querySelectorAll('.tab-content');
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
 
-        function switchTab(tabId) {
-            for(var i = 0; i < contents.length; i++) {
-                contents[i].classList.remove('active');
+            const tabOrder = Array.from(tabButtons).map(btn => btn.dataset.tab);
+            let currentTabId = 'home';
+            let isAnimating = false;
+
+            function getDirection(fromTab, toTab) {
+                const fromIndex = tabOrder.indexOf(fromTab);
+                const toIndex = tabOrder.indexOf(toTab);
+                if (fromIndex === -1 || toIndex === -1) return 'right';
+                return toIndex > fromIndex ? 'right' : 'left';
             }
 
-            var activeContent = document.getElementById(tabId);
-            if(activeContent) {
-                activeContent.classList.add('active');
+            function activateTab(targetTabId) {
+                if (isAnimating) return;
+                if (targetTabId === currentTabId) return;
+
+                const currentContent = document.getElementById(currentTabId);
+                const targetContent = document.getElementById(targetTabId);
+
+                if (!currentContent || !targetContent) return;
+
+                const direction = getDirection(currentTabId, targetTabId);
+                isAnimating = true;
+
+                tabButtons.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.tab === targetTabId);
+                });
+
+                const exitClass = direction === 'right' ? 'animate-out-left' : 'animate-out-right';
+                currentContent.classList.add(exitClass);
+
+                setTimeout(() => {
+                    currentContent.classList.remove('active', exitClass);
+                    currentContent.style.display = 'none';
+
+                    targetContent.style.display = 'block';
+
+                    const enterClass = direction === 'right' ? 'animate-in-right' : 'animate-in-left';
+                    targetContent.classList.add(enterClass);
+
+                    setTimeout(() => {
+                        targetContent.classList.add('active');
+                        setTimeout(() => {
+                            targetContent.classList.remove(enterClass);
+                            isAnimating = false;
+                        }, 350);
+                    }, 10);
+
+                    currentTabId = targetTabId;
+                }, 350);
             }
 
-            for(var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove('active');
-                if(buttons[i].getAttribute('data-tab') === tabId) {
-                    buttons[i].classList.add('active');
-                }
-            }
-        }
-
-        for(var i = 0; i < buttons.length; i++) {
-            buttons[i].addEventListener('click', function() {
-                var tabId = this.getAttribute('data-tab');
-                switchTab(tabId);
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabId = btn.dataset.tab;
+                    if (tabId && !isAnimating) {
+                        activateTab(tabId);
+                    }
+                });
             });
-        }
+
+            tabContents.forEach(content => {
+                if (!content.classList.contains('active')) {
+                    content.style.display = 'none';
+                } else {
+                    currentTabId = content.id;
+                }
+            });
+        });
     </script>
 </body>
 </html>
