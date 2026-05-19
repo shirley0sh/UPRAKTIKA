@@ -765,6 +765,13 @@ function setupDragAndDrop() {
 
         pointsLayer.addEventListener('drop', async (e) => {
             e.preventDefault();
+
+            if (points.length >= 15) {
+                alert(`Достигнут лимит вершин (15).`);
+                return;
+            }
+
+
             const rect = pointsLayer.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -784,32 +791,81 @@ function setupDragAndDrop() {
         });
     }
 }
-// Добавьте эту функцию в конец prim.js
-async function saveMatrixToJSON() {
-    try {
-        const response = await fetch('/api/graph/matrix');
-        const data = await response.json();
 
-        if (data.success) {
-            const jsonString = JSON.stringify(data.matrix, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `matrix_${new Date().toISOString().slice(0, 19)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert('Матрица сохранена!');
-        } else {
-            alert('Ошибка при сохранении матрицы: ' + (data.error || 'Неизвестная ошибка'));
-        }
-    } catch (error) {
-        console.error('Error saving matrix:', error);
-        alert('Ошибка при сохранении: ' + error.message);
+function getMSTData() {
+    const resultDiv = document.getElementById('mst-result');
+    const edgesList = document.getElementById('mst-edges-list');
+    const totalDiv = document.getElementById('mst-total');
+
+    // Проверяем, есть ли результат MST
+    if (!resultDiv.classList.contains('show')) {
+        return null;
     }
+
+    const mstEdges = [];
+    const edgeElements = edgesList.querySelectorAll('.mst-edge');
+
+    edgeElements.forEach(element => {
+        const text = element.textContent;
+        // Парсим строку вида "1. 1 → 2 : 150"
+        const match = text.match(/(\d+)\s*→\s*(\d+)\s*:\s*(\d+(?:\.\d+)?)/);
+        if (match) {
+            mstEdges.push({
+                from: parseInt(match[1]),
+                to: parseInt(match[2]),
+                weight: parseFloat(match[3])
+            });
+        }
+    });
+
+    // Извлекаем общий вес
+    const totalMatch = totalDiv.textContent.match(/([\d.]+)/);
+    const totalWeight = totalMatch ? parseFloat(totalMatch[1]) : 0;
+
+    return {
+        success: true,
+        edges: mstEdges,
+        total_weight: totalWeight,
+        timestamp: new Date().toISOString(),
+        algorithm: 'Prim\'s MST',
+        vertex_count: mstEdges.length > 0 ?
+            new Set(mstEdges.flatMap(e => [e.from, e.to])).size : 0
+    };
 }
+
+
+function downloadMSTAsJSON() {
+    const mstData = getMSTData();
+
+    if (!mstData) {
+        alert('Нет данных для сохранения. Сначала запустите алгоритм Прима.');
+        return;
+    }
+
+    // Форматируем JSON с отступами для читаемости
+    const jsonString = JSON.stringify(mstData, null, 2);
+
+    // Создаём Blob с JSON‑данными
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Создаём ссылку для скачивания
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mst_result_${new Date().toISOString().slice(0, 10)}.json`;
+
+    // Добавляем в документ, кликаем и удаляем
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Освобождаем память
+    URL.revokeObjectURL(url);
+
+    console.log('MST data saved:', mstData);
+}
+
+
 // ============ ИНИЦИАЛИЗАЦИЯ ============
 async function init() {
     console.log('Initializing Prim editor...');
@@ -825,7 +881,7 @@ async function init() {
     document.getElementById('random-btn')?.addEventListener('click', generateRandomDistances);
     document.getElementById('clear-graph-btn')?.addEventListener('click', clearGraph);
     document.getElementById('prim-btn')?.addEventListener('click', computePrimMST);
-    document.getElementById('save-matrix-btn')?.addEventListener('click', saveMatrixToJSON);
+    document.getElementById('save-mst-json-btn')?.addEventListener('click', downloadMSTAsJSON);
     console.log('Initialized, points:', points.length);
 }
 

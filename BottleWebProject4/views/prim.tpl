@@ -210,6 +210,7 @@
 
             <div id="point-drag" class="draggable-point" draggable="true">+ Добавить вершину</div>
 
+
             <!-- Панель выбора стартовой вершины -->
             <div class="start-vertex-panel">
                 <div class="random-title">Стартовая вершина</div>
@@ -235,6 +236,7 @@
             <!-- Кнопки управления -->
             <button id="clear-graph-btn" class="btn btn-warning">Очистить граф</button>
             <button id="prim-btn" class="btn btn-primary" style="margin-top: 10px;">Найти кратчайший остов</button>
+            <button id="save-mst-json-btn" class="btn btn-primary" style="margin-top: 10px;">Сохранить результат MST в JSON</button>
             
 
             <!-- Результаты MST -->
