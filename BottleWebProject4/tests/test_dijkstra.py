@@ -107,25 +107,47 @@ class TestDijkstraAlgorithm(unittest.TestCase):
         result = calculate_paths(self.linear_matrix, start=1)
 
         self.assertEqual(result['dist'], [0, 1, 2, 3])
-
         self.assertEqual(result['paths'][4], [[1, 2, 3, 4]])
+
 
 
     def test_calculate_paths_disconnected(self):
         result = calculate_paths(self.disconnected_matrix, start=1)
 
         self.assertEqual(result['dist'][0], 0)
-        
         self.assertEqual(result['dist'][1], 2)
-        
         self.assertEqual(result['dist'][2], float('inf'))
 
         
         self.assertIn([1], result['paths'][1])
-        
         self.assertIn([1, 2], result['paths'][2])
-        
         self.assertEqual(result['paths'][3], [])
+
+
+    def test_dijkstra_custom(self):
+        custom_matrix = [
+            [],
+            [0, 0, 3, 1],
+            [0, 3, 0, 1],
+            [0, 1, 1, 0] 
+        ]
+
+        expected_dist = [0, 2, 1]
+
+        expected_paths = {
+            1: [[1]],
+            2: [[1, 3, 2]],
+            3: [[1, 3]]
+        }
+
+        result = calculate_paths(custom_matrix, start=1)
+
+        self.assertEqual(result['dist'], expected_dist)
+
+        for vertex, paths in expected_paths.items():
+            for path in paths:
+                self.assertIn(path, result['paths'][vertex])
+
 
 
 
