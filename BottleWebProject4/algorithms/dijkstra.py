@@ -2,20 +2,10 @@
 import json
 
 def dijkstra(matrix, start):
-    """
-    Реализация алгоритма Дейкстры
-    
-    Args:
-        matrix: список списков, матрица весов (1-индексация)
-        start: int, стартовая вершина
-    
-    Returns:
-        dict: {'dist': [список расстояний], 'prev': [список предыдущих вершин]}
-    """
     n = len(matrix) - 1
     dist = [float('inf')] * (n + 1)
     visited = [False] * (n + 1)
-    prev = [None] * (n + 1)
+    prev = [[] for _ in range(n + 1)]
     
     dist[start] = 0
     
@@ -26,10 +16,10 @@ def dijkstra(matrix, start):
             if not visited[v] and dist[v] < min_dist:
                 min_dist = dist[v]
                 u = v
-        
+                
         if u == -1:
             break
-        
+            
         visited[u] = True
         
         for v in range(1, n + 1):
@@ -37,41 +27,37 @@ def dijkstra(matrix, start):
                 new_dist = dist[u] + matrix[u][v]
                 if new_dist < dist[v]:
                     dist[v] = new_dist
-                    prev[v] = u
-    
-    return {
-        'dist': dist,
-        'prev': prev
-    }
+                    prev[v] = [u] 
+                elif new_dist == dist[v]:
+                    prev[v].append(u) 
+                    
+    return {'dist': dist, 'prev': prev}
 
 
-def get_path(prev, start, end):
-    """Восстановление пути из prev"""
-    if prev[end] is None and start != end:
-        return None
-    
-    path = []
-    cur = end
-    while cur is not None:
-        path.insert(0, cur)
-        if cur == start:
-            break
-        cur = prev[cur]
-    
-    return path
+def get_all_paths(prev, start, end):
+    """Возвращает список всех кратчайших путей от start до end"""
+    if start == end:
+        return [[start]]
+    if not prev[end]:
+        return []
+        
+    all_paths = []
+    for p in prev[end]:
+        for sub_path in get_all_paths(prev, start, p):
+            all_paths.append(sub_path + [end])
+    return all_paths
 
 
 def calculate_paths(matrix, start):
-    """Вычисление всех кратчайших путей"""
     result = dijkstra(matrix, start)
     paths = {}
     n = len(matrix) - 1
     for v in range(1, n + 1):
-        path = get_path(result['prev'], start, v)
-        paths[v] = path
-    output = {
+        paths[v] = get_all_paths(result['prev'], start, v)
+        
+    return {
         'dist': result['dist'][1:],
         'prev': result['prev'][1:],
         'paths': paths
     }
-    return output
+
