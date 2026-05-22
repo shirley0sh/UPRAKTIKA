@@ -21,6 +21,9 @@
     <InterpreterId>MSBuild|env1|$(MSBuildProjectFullPath)</InterpreterId>
     <IsWindowsApplication>False</IsWindowsApplication>
     <WebBrowserPort>8080</WebBrowserPort>
+    <TestFramework>unittest</TestFramework>
+    <UnitTestPattern>test*.py</UnitTestPattern>
+    <UnitTestRootDirectory>.</UnitTestRootDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,12 +36,22 @@
   <ItemGroup>
     <Compile Include="algorithms\dijkstra.py" />
     <Compile Include="algorithms\prim.py" />
+    <Compile Include="algorithms\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app.py" />
     <Compile Include="graph_prima.py" />
     <Compile Include="routes.py" />
+    <Compile Include="tests\test_1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="tests\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="algorithms\" />
+    <Folder Include="tests\" />
     <Folder Include="theory\" />
     <Folder Include="static\" />
     <Folder Include="static\content\" />
