@@ -168,7 +168,8 @@ def random_distances():
 
     edges = graph.get_edges()
     for edge in edges:
-        random_dist = min_val + random.random() * (max_val - min_val)
+        # Генерируем ЦЕЛОЕ число от min_val до max_val
+        random_dist = random.randint(int(min_val), int(max_val))
         graph.set_edge_distance(edge['from'], edge['to'], random_dist)
         dijkstra_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
         kruskal_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
