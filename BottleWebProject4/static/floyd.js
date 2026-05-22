@@ -1,8 +1,6 @@
 // Флаг для предотвращения двойной инициализации
 let isFloydInitialized = false;
 
-
-// Функция генерации случайных расстояний для страницы Флойда
 async function generateRandomDistancesFloyd() {
     const minInput = document.getElementById('random-min');
     const maxInput = document.getElementById('random-max');
@@ -16,25 +14,24 @@ async function generateRandomDistancesFloyd() {
     let min = parseInt(minInput.value);
     let max = parseInt(maxInput.value);
 
-    if (isNaN(min)) {
-        alert('Введите корректное минимальное значение');
-        minInput.focus();
-        return;
-    }
     if (isNaN(max)) {
         alert('Введите корректное максимальное значение');
         maxInput.focus();
         return;
     }
 
-    // Проверка: минимум строго больше 0
+    if (isNaN(min)) {
+        alert('Введите корректное минимальное значение');
+        minInput.focus();
+        return;
+    }
+
     if (min <= MIN_DISTANCE) {
         alert(`Минимальное расстояние должно быть строго больше ${MIN_DISTANCE}`);
         minInput.focus();
         return;
     }
 
-    // Проверка: максимум не превышает 1 000 000
     if (max > MAX_DISTANCE) {
         alert(`Максимальное расстояние не может превышать ${MAX_DISTANCE}`);
         maxInput.focus();
@@ -75,7 +72,6 @@ async function generateRandomDistancesFloyd() {
     }
 }
 
-// Функция очистки графа для страницы Флойда
 async function clearGraphFloyd() {
     if (!confirm('Очистить все точки и линии?')) return;
 
