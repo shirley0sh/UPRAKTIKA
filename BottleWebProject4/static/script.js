@@ -127,7 +127,7 @@ function redrawLines() {
         textElem.setAttribute('font-weight', 'bold');
 
         if (distance > 0) {
-            textElem.textContent = distance.toFixed(2);
+            textElem.textContent = Math.round(distance);
             textElem.setAttribute('fill', '#e74c3c');
         } else {
             textElem.textContent = '?';
