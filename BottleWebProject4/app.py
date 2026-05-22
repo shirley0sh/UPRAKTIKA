@@ -5,12 +5,14 @@ import math
 import random
 from graph_floyd import FloydWarshallGraph
 from graph_dijkstra import DijkstraGraph
+from graph_kruskal import KruskalGraph
 
 app = Bottle()
 
 # Создаем экземпляры графов
 graph = FloydWarshallGraph()
 dijkstra_graph = DijkstraGraph()
+kruskal_graph = KruskalGraph()
 
 @app.route('/')
 def index():
@@ -20,13 +22,49 @@ def index():
 def floyd_page():
     return template('floyd')
 
-@app.route('/kruskal')
-def kruskal_page():
-    return template('kruskal')
-
 @app.route('/dijkstra')
 def dijkstra_page():
     return template('dijkstra')
+
+@app.route('/kruskal')  
+def kruskal_page():
+    return template('kruskal')
+
+@app.route('/api/kruskal/calculate', method='POST')
+def kruskal_calculate():
+    """API для алгоритма Краскала"""
+    data = request.json
+    
+    # Получаем матрицу из запроса
+    matrix = data.get('matrix')
+    n = data.get('n')
+    
+    if not matrix or not n:
+        response.status = 400
+        return json.dumps({'error': 'Matrix and n required'})
+    
+    # Выполняем алгоритм Краскала
+    result = kruskal_graph.kruskal(matrix, n)
+    
+    response.content_type = 'application/json'
+    return json.dumps(result)
+
+@app.route('/api/kruskal/from-graph', method='POST')
+def kruskal_from_graph():
+    """API для алгоритма Краскала из текущего графа"""
+    # Берём матрицу из текущего графа Краскала
+    matrix = kruskal_graph.get_adjacency_matrix()
+    n = kruskal_graph.get_vertex_count()
+    
+    if n == 0:
+        response.status = 400
+        return json.dumps({'error': 'Graph is empty'})
+    
+    # Выполняем алгоритм Краскала
+    result = kruskal_graph.kruskal(matrix, n)
+    
+    response.content_type = 'application/json'
+    return json.dumps(result)
 
 @app.route('/feedback', method='POST')
 def handle_feedback():
@@ -61,6 +99,7 @@ def update_graph():
     data = request.json
     graph.from_dict(data)
     dijkstra_graph.from_dict(data)
+    kruskal_graph.from_dict(data)
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -70,6 +109,7 @@ def add_vertex():
     vid = graph.next_id
     graph.add_vertex(vid, data['x'], data['y'])
     dijkstra_graph.add_vertex(vid, data['x'], data['y'])
+    kruskal_graph.add_vertex(vid, data['x'], data['y'])
     response.content_type = 'application/json'
     return json.dumps({'id': vid, 'x': data['x'], 'y': data['y']})
 
@@ -77,6 +117,7 @@ def add_vertex():
 def remove_vertex(vid):
     graph.remove_vertex(int(vid))
     dijkstra_graph.remove_vertex(int(vid))
+    kruskal_graph.remove_vertex(int(vid))
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -85,6 +126,7 @@ def update_vertex_position(vid):
     data = request.json
     graph.update_vertex_position(int(vid), data['x'], data['y'])
     dijkstra_graph.update_vertex_position(int(vid), data['x'], data['y'])
+    kruskal_graph.update_vertex_position(int(vid), data['x'], data['y'])
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -94,6 +136,7 @@ def add_edge():
     success = graph.add_edge(data['v1'], data['v2'], data.get('distance'))
     if success:
         dijkstra_graph.add_edge(data['v1'], data['v2'], data.get('distance'))
+    kruskal_graph.add_edge(data['v1'], data['v2'], data.get('distance'))
     response.content_type = 'application/json'
     return json.dumps({'success': success})
 
@@ -103,6 +146,7 @@ def remove_edge():
     success = graph.remove_edge(data['v1'], data['v2'])
     if success:
         dijkstra_graph.remove_edge(data['v1'], data['v2'])
+        kruskal_graph.remove_edge(data['v1'], data['v2']) 
     response.content_type = 'application/json'
     return json.dumps({'success': success})
 
@@ -112,6 +156,7 @@ def set_edge_distance():
     success = graph.set_edge_distance(data['v1'], data['v2'], data['distance'])
     if success:
         dijkstra_graph.set_edge_distance(data['v1'], data['v2'], data['distance'])
+        kruskal_graph.set_edge_distance(data['v1'], data['v2'], data['distance']) 
     response.content_type = 'application/json'
     return json.dumps({'success': success, 'distance': data['distance']})
 
@@ -126,6 +171,7 @@ def random_distances():
         random_dist = min_val + random.random() * (max_val - min_val)
         graph.set_edge_distance(edge['from'], edge['to'], random_dist)
         dijkstra_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
+        kruskal_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
 
     response.content_type = 'application/json'
     return json.dumps({'success': True, 'count': len(edges)})
@@ -159,5 +205,6 @@ if __name__ == '__main__':
     print("Main page: http://localhost:8080")
     print("Floyd-Warshall: http://localhost:8080/floyd")
     print("Dijkstra: http://localhost:8080/dijkstra")
+    print("Kruskal: http://localhost:8080/kruskal")
     print("=" * 50)
     run(app, host='localhost', port=8080, debug=True, reloader=True)
