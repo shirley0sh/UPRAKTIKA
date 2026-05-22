@@ -5,12 +5,15 @@ import math
 import random
 from graph_floyd import FloydWarshallGraph
 from graph_dijkstra import DijkstraGraph
+from graph_prima import PrimaGraph
+from algorithms.prim import find_minimum_spanning_tree
 
 app = Bottle()
 
 # Создаем экземпляры графов
 graph = FloydWarshallGraph()
 dijkstra_graph = DijkstraGraph()
+prima_graph = PrimaGraph()
 
 @app.route('/')
 def index():
@@ -57,6 +60,7 @@ def update_graph():
     data = request.json
     graph.from_dict(data)
     dijkstra_graph.from_dict(data)
+    prima_graph.from_dict(data)
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -66,6 +70,7 @@ def add_vertex():
     vid = graph.next_id
     graph.add_vertex(vid, data['x'], data['y'])
     dijkstra_graph.add_vertex(vid, data['x'], data['y'])
+    prima_graph.add_vertex(vid, data['x'], data['y'])
     response.content_type = 'application/json'
     return json.dumps({'id': vid, 'x': data['x'], 'y': data['y']})
 
@@ -73,6 +78,7 @@ def add_vertex():
 def remove_vertex(vid):
     graph.remove_vertex(int(vid))
     dijkstra_graph.remove_vertex(int(vid))
+    prima_graph.remove_vertex(int(vid)) 
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -81,6 +87,7 @@ def update_vertex_position(vid):
     data = request.json
     graph.update_vertex_position(int(vid), data['x'], data['y'])
     dijkstra_graph.update_vertex_position(int(vid), data['x'], data['y'])
+    prima_graph.update_vertex_position(int(vid), data['x'], data['y'])
     response.content_type = 'application/json'
     return json.dumps({'success': True})
 
@@ -90,6 +97,7 @@ def add_edge():
     success = graph.add_edge(data['v1'], data['v2'], data.get('distance'))
     if success:
         dijkstra_graph.add_edge(data['v1'], data['v2'], data.get('distance'))
+        prima_graph.add_edge(data['v1'], data['v2'], data.get('distance'))
     response.content_type = 'application/json'
     return json.dumps({'success': success})
 
@@ -99,6 +107,7 @@ def remove_edge():
     success = graph.remove_edge(data['v1'], data['v2'])
     if success:
         dijkstra_graph.remove_edge(data['v1'], data['v2'])
+        prima_graph.remove_edge(data['v1'], data['v2'])
     response.content_type = 'application/json'
     return json.dumps({'success': success})
 
@@ -108,6 +117,7 @@ def set_edge_distance():
     success = graph.set_edge_distance(data['v1'], data['v2'], data['distance'])
     if success:
         dijkstra_graph.set_edge_distance(data['v1'], data['v2'], data['distance'])
+        prima_graph.set_edge_distance(data['v1'], data['v2'], data['distance'])
     response.content_type = 'application/json'
     return json.dumps({'success': success, 'distance': data['distance']})
 
@@ -119,9 +129,10 @@ def random_distances():
 
     edges = graph.get_edges()
     for edge in edges:
-        random_dist = min_val + random.random() * (max_val - min_val)
+        random_dist = round(min_val + random.random() * (max_val - min_val),3)
         graph.set_edge_distance(edge['from'], edge['to'], random_dist)
         dijkstra_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
+        prima_graph.set_edge_distance(edge['from'], edge['to'], random_dist)
 
     response.content_type = 'application/json'
     return json.dumps({'success': True, 'count': len(edges)})
@@ -152,6 +163,78 @@ def dijkstra_calculate():
 @app.route('/prim')
 def prim_page():
     return template('prim')
+
+@app.route('/api/prim/calculate', method='POST')
+def prim_calculate():
+    try:
+        data = request.json
+        start_vertex = data.get('start_vertex')
+
+        # Получаем вершины
+        graph_data = graph.to_dict()
+        vertices = graph_data['vertices']
+
+        # Получаем рёбра
+        edges_list = []
+
+        for v1 in graph.adjacency:
+            for v2, weight in graph.adjacency[v1].items():
+                # Чтобы не дублировать ребра
+                if v1 < v2:
+                    edges_list.append({
+                        'from': v1,
+                        'to': v2,
+                        'weight': weight
+                    })
+
+        # Запускаем алгоритм Прима
+        result = find_minimum_spanning_tree(
+            vertices,
+            edges_list,
+            int(start_vertex)
+        )
+
+        response.content_type = 'application/json'
+        return json.dumps(result)
+
+    except Exception as e:
+        response.content_type = 'application/json'
+        return json.dumps({
+            'success': False,
+            'error': str(e)
+        })
+
+@app.route('/api/prima/mst', method='POST')
+def prima_mst():
+    data = request.json
+    start_vertex = data.get('start_vertex')
+    
+    # Копируем данные из основного графа (или используй свой)
+    # Если у тебя отдельный граф для Прима, используй prima_graph
+    result = prima_graph.prim_mst(start_vertex)
+    
+    response.content_type = 'application/json'
+    return json.dumps(result)
+
+@app.route('/api/prima/statistics', method='GET')
+def prima_statistics():
+    response.content_type = 'application/json'
+    return json.dumps(prima_graph.get_statistics())
+
+# Добавьте эту функцию в ваш серверный файл
+@app.route('/api/prim/matrix', methods=['GET'])
+def get_graph_matrix():
+    """Возвращает матрицу весов графа"""
+    try:
+        from prim import get_weight_matrix
+        
+        with graph_lock:  # если у вас есть блокировка для потокобезопасности
+            result = get_weight_matrix(graph_data['vertices'], graph_data['edges'])
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error in get_graph_matrix: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("=" * 50)

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿prim.tpl
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -123,6 +124,80 @@
             padding-top: 10px;
             border-top: 2px solid #e8d7cf;
         }
+        
+        /* Стили для матрицы весов */
+        .weight-matrix-container {
+            overflow-x: auto;
+            max-width: 100%;
+            max-height: 400px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .weight-matrix-table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 12px;
+        }
+        
+        .weight-matrix-table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            background: #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .weight-matrix-table td {
+            border: 1px solid #ddd;
+            padding: 4px;
+            text-align: center;
+        }
+        
+        .weight-matrix-table .diagonal {
+            background: #e8e8e8;
+        }
+        
+        .weight-matrix-table .no-edge {
+            background: #fafafa;
+            color: #ccc;
+        }
+        
+        .weight-matrix-table .has-edge {
+            background: white;
+        }
+        
+        .matrix-weight-input {
+            width: 60px;
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        .matrix-weight-input:focus {
+            outline: none;
+            border-color: #5a4d5e;
+            box-shadow: 0 0 3px rgba(90, 77, 94, 0.3);
+        }
+        
+        .matrix-weight-input:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .matrix-placeholder {
+            padding: 20px;
+            text-align: center;
+            color: #999;
+        }
+        
+        .btn-save-matrix {
+            margin-top: 10px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -131,18 +206,20 @@
             <div class="nav-buttons">
                 <a href="/" class="nav-btn">← Вернуться на главную</a>
             </div>
-            <h3>Алгоритм прима - поиск кратчайшего остова</h3>
+            <h3>Алгоритм Прима - поиск кратчайшего остова</h3>
 
             <div id="point-drag" class="draggable-point" draggable="true">+ Добавить вершину</div>
+
 
             <!-- Панель выбора стартовой вершины -->
             <div class="start-vertex-panel">
                 <div class="random-title">Стартовая вершина</div>
-                <label class="random-label">Выберите стартовую вершину</label>
+                <label class="random-label">Выберите стартовую вершину для алгоритма Прима</label>
                 <select id="start-vertex-select" class="start-vertex-select">
+                    <option value="">Нет вершин</option>
                 </select>
                 <div style="font-size: 11px; color: #666; margin-top: 5px;">
-                    ℹ️ Алгоритм прима выберет вершину
+                    ℹ️ Алгоритм построит минимальное остовное дерево
                 </div>
             </div>
 
@@ -159,10 +236,12 @@
             <!-- Кнопки управления -->
             <button id="clear-graph-btn" class="btn btn-warning">Очистить граф</button>
             <button id="prim-btn" class="btn btn-primary" style="margin-top: 10px;">Найти кратчайший остов</button>
+            <button id="save-mst-json-btn" class="btn btn-primary" style="margin-top: 10px;">Сохранить результат MST в JSON</button>
+            
 
             <!-- Результаты MST -->
             <div id="mst-result" class="mst-result">
-                <div class="random-title">Результат</div>
+                <div class="random-title">Результат работы алгоритма Прима</div>
                 <div id="mst-edges-list"></div>
                 <div id="mst-total" class="mst-total"></div>
             </div>
@@ -174,7 +253,6 @@
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
     <script src="/static/prim.js"></script>
 </body>
 </html>
