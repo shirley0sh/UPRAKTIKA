@@ -566,24 +566,58 @@ function initUI() {
 // Настройка Drag & Drop для главной страницы
 function setupDragAndDrop() {
     if (draggable) {
+        const newDraggable = draggable.cloneNode(true);
+        draggable.parentNode.replaceChild(newDraggable, draggable);
+        draggable = newDraggable;
+        
+        let dragStartedFromButton = false;
+        
         draggable.addEventListener('dragstart', (e) => {
+            dragStartedFromButton = true;
             e.dataTransfer.setData('text/plain', 'point');
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+        
+        draggable.addEventListener('dragend', (e) => {
+            setTimeout(() => {
+                dragStartedFromButton = false;
+            }, 100);
         });
     }
 
     if (pointsLayer) {
-        pointsLayer.addEventListener('dragover', (e) => e.preventDefault());
+        // Убираем старые обработчики, чтобы не было дублей
+        const newPointsLayer = pointsLayer.cloneNode(true);
+        pointsLayer.parentNode.replaceChild(newPointsLayer, pointsLayer);
+        pointsLayer = newPointsLayer;
+        
+        pointsLayer.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
 
         pointsLayer.addEventListener('drop', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            
             const rect = pointsLayer.getBoundingClientRect();
-            addPoint(e.clientX - rect.left, e.clientY - rect.top);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Проверяем, что перетаскивание было именно с кнопки
+            const dragData = e.dataTransfer.getData('text/plain');
+            if (dragData === 'point') {
+                addPoint(x, y);
+            }
         });
 
         pointsLayer.addEventListener('dblclick', (e) => {
             const target = e.target;
             if (target.classList && target.classList.contains('point')) {
-                removePoint(parseInt(target.dataset.id));
+                const id = parseInt(target.dataset.id);
+                if (typeof removePoint === 'function') {
+                    removePoint(id);
+                }
             }
         });
 
@@ -603,8 +637,19 @@ function setupDragAndDrop() {
     });
 }
 
+
 // Инициализация главного редактора
 function initGraphEditor() {
+    // Проверяем, не страница ли это Флойда или Краскала (чтобы не было двойной инициализации)
+    if (window.location.pathname === '/floyd') {
+        console.log('Floyd page detected, skipping main editor init');
+        return;
+    }
+    if (window.location.pathname === '/kruskal') {
+        console.log('Kruskal page detected, skipping main editor init');
+        return;
+    }
+
     console.log('Initializing main graph editor...');
 
     // Переопределяем DOM элементы
