@@ -1,34 +1,46 @@
-// Функция генерации случайных расстояний для страницы Флойда
+// Флаг для предотвращения двойной инициализации
+let isFloydInitialized = false;
+
 async function generateRandomDistancesFloyd() {
     const minInput = document.getElementById('random-min');
     const maxInput = document.getElementById('random-max');
 
     if (!minInput || !maxInput) {
         console.error('Input elements not found');
-        alert('Error: Input elements not found');
+        alert('Ошибка: элементы ввода не найдены');
         return;
     }
 
     let min = parseInt(minInput.value);
     let max = parseInt(maxInput.value);
 
-    if (isNaN(min)) {
-        alert('Please enter a valid minimum value');
-        minInput.focus();
-        return;
-    }
     if (isNaN(max)) {
-        alert('Please enter a valid maximum value');
+        alert('Введите корректное максимальное значение');
         maxInput.focus();
         return;
     }
-    if (min >= max) {
-        alert('Minimum must be less than maximum');
+
+    if (isNaN(min)) {
+        alert('Введите корректное минимальное значение');
         minInput.focus();
         return;
     }
-    if (min < 0 || max < 0) {
-        alert('Values cannot be negative');
+
+    if (min <= MIN_DISTANCE) {
+        alert(`Минимальное расстояние должно быть строго больше ${MIN_DISTANCE}`);
+        minInput.focus();
+        return;
+    }
+
+    if (max > MAX_DISTANCE) {
+        alert(`Максимальное расстояние не может превышать ${MAX_DISTANCE}`);
+        maxInput.focus();
+        return;
+    }
+
+    if (min >= max) {
+        alert('Минимум должен быть меньше максимума');
+        minInput.focus();
         return;
     }
 
@@ -42,101 +54,148 @@ async function generateRandomDistancesFloyd() {
         const data = await response.json();
 
         if (data.success) {
-            // Обновляем локальные данные
             const graphResponse = await fetch('/api/graph');
             const graphData = await graphResponse.json();
 
             if (graphData.edges) {
                 window.lineConnections = graphData.edges;
-                redrawLines();
+                if (typeof redrawLines === 'function') {
+                    redrawLines();
+                }
             }
 
-            alert(`Random distances assigned to ${data.count} line(s)!`);
+            alert(`Случайные расстояния присвоены ${data.count} ребру(ам)!`);
         }
-
     } catch (error) {
         console.error('Error generating random distances:', error);
-        alert('Error generating random distances');
+        alert('Ошибка генерации случайных расстояний');
     }
 }
 
-// Функция очистки графа для страницы Флойда
 async function clearGraphFloyd() {
-    if (!confirm('Clear all points and lines?')) return;
+    if (!confirm('Очистить все точки и линии?')) return;
 
-    points.forEach(p => {
-        if (p.element) p.element.remove();
-    });
-        points = [];
-        window.lineConnections = [];
-        selectedPointId = null;
-        selectedLine = null;
-
-        await fetch('/api/graph/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ vertices: {}, edges: [] })
+    if (points && points.length) {
+        points.forEach(p => {
+            if (p.element && p.element.parentNode) {
+                p.element.remove();
+            }
         });
+    }
 
+    points = [];
+    window.lineConnections = [];
+    selectedPointId = null;
+    selectedLine = null;
+
+    if (linesSvg) {
+        linesSvg.innerHTML = '';
+    }
+    lines = [];
+
+    await fetch('/api/graph/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vertices: {}, edges: [] })
+    });
+
+    if (typeof redrawAll === 'function') {
         redrawAll();
+    }
 }
 
-// Инициализация редактора Флойда
+// Инициализация редактора Флойда (только один раз)
 function initFloydEditor() {
+    if (isFloydInitialized) {
+        console.log('Floyd editor already initialized, skipping...');
+        return;
+    }
+
+    if (window.location.pathname !== '/floyd') {
+        console.log('Not on Floyd page, skipping init');
+        return;
+    }
+
+    isFloydInitialized = true;
     console.log('Initializing Floyd editor...');
 
-    // Используем стандартные ID (как в script.js)
+    const canvas = document.getElementById('canvas');
     pointsLayer = document.getElementById('points-layer');
     linesSvg = document.getElementById('lines-layer');
     draggable = document.getElementById('point-drag');
 
-    // Переопределяем глобальные переменные
-    window.pointsLayer = pointsLayer;
-    window.linesSvg = linesSvg;
-    window.draggable = draggable;
+    if (!pointsLayer || !linesSvg) {
+        console.error('Required DOM elements not found');
+        return;
+    }
 
-    // Настройка Drag & Drop
+    pointsLayer.innerHTML = '';
+
+    if (typeof points !== 'undefined' && points.length) {
+        points = [];
+    }
+    if (typeof window.lineConnections !== 'undefined') {
+        window.lineConnections = [];
+    }
+    if (typeof lines !== 'undefined') {
+        lines = [];
+    }
+    selectedPointId = null;
+    selectedLine = null;
+
     if (draggable) {
+        const newDraggable = draggable.cloneNode(true);
+        draggable.parentNode.replaceChild(newDraggable, draggable);
+        draggable = newDraggable;
+
         draggable.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', 'point');
         });
     }
 
-    if (pointsLayer) {
-        pointsLayer.addEventListener('dragover', (e) => e.preventDefault());
+    pointsLayer.addEventListener('dragover', (e) => e.preventDefault());
 
-        pointsLayer.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const rect = pointsLayer.getBoundingClientRect();
-            addPoint(e.clientX - rect.left, e.clientY - rect.top);
-        });
+    pointsLayer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const rect = pointsLayer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        if (typeof addPoint === 'function') {
+            addPoint(x, y);
+        }
+    });
 
-        pointsLayer.addEventListener('dblclick', (e) => {
-            const target = e.target;
-            if (target.classList && target.classList.contains('point')) {
-                removePoint(parseInt(target.dataset.id));
+    pointsLayer.addEventListener('dblclick', (e) => {
+        const target = e.target;
+        if (target.classList && target.classList.contains('point')) {
+            const id = parseInt(target.dataset.id);
+            if (typeof removePoint === 'function') {
+                removePoint(id);
             }
-        });
+        }
+    });
 
-        pointsLayer.addEventListener('click', () => {
+    pointsLayer.addEventListener('click', () => {
+        if (typeof clearSelectedPoints === 'function') {
             clearSelectedPoints();
-            if (selectedLine) {
+        }
+        if (selectedLine) {
+            if (selectedLine.style) {
                 selectedLine.style.stroke = '#bdc2ce';
-                selectedLine = null;
             }
-        });
+            selectedLine = null;
+        }
+    });
+
+    linesSvg.style.pointerEvents = 'none';
+
+    if (typeof loadGraph === 'function') {
+        loadGraph();
     }
 
-    // Загружаем граф
-    loadGraph();
-
-    // Назначаем обработчики кнопок (стандартные ID из floyd.tpl)
     const randomBtn = document.getElementById('random-btn');
     if (randomBtn) {
         randomBtn.onclick = generateRandomDistancesFloyd;
-        console.log('Random button handler assigned');
-    } else {
-        console.error('random-btn not found');
     }
 
     const clearBtn = document.getElementById('clear-graph-btn');
@@ -148,7 +207,331 @@ function initFloydEditor() {
     if (computeBtn) {
         computeBtn.onclick = showFloydWarshall;
     }
+
+    const matrixBtn = document.getElementById('floyd-matrix');
+    if (matrixBtn) {
+        matrixBtn.onclick = showMatrix;
+    }
 }
+
+async function showMatrix() {
+    try {
+        const response = await fetch('/api/floyd/paths-matrix');
+        if (!response.ok) throw new Error('Ошибка загрузки данных с сервера');
+        const data = await response.json();
+
+        if (!data || !data.vertices || data.vertices.length === 0) {
+            alert('Нет данных о графе. Сначала создайте вершины и ребра.');
+            return;
+        }
+
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
+        modal.style.zIndex = '2100';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.overflow = 'auto';
+
+        const content = document.createElement('div');
+        content.style.backgroundColor = 'white';
+        content.style.padding = '20px';
+        content.style.borderRadius = '12px';
+        content.style.maxWidth = '95%';
+        content.style.maxHeight = '85%';
+        content.style.overflow = 'auto';
+        content.style.boxShadow = '0 10px 40px rgba(0,0,0,0.3)';
+        content.style.display = 'flex';
+        content.style.flexDirection = 'column';
+
+        // Автоматическая ширина в зависимости от количества вершин
+        const vertices = data.vertices;
+        const n = vertices.length;
+
+        // Базовая ширина на одну ячейку (включая padding и границы)
+        const cellWidth = 150; // пикселей на ячейку
+        const minContentWidth = n * cellWidth + 150; // +100 для индексов
+        content.style.width = Math.min(Math.max(minContentWidth, 500), window.innerWidth - 40) + 'px';
+
+        const title = document.createElement('h2');
+        title.textContent = 'Матрица смежности (неориентированный граф)';
+        title.style.textAlign = 'center';
+        title.style.marginBottom = '20px';
+        title.style.color = '#5a4d5e';
+        title.style.fontSize = Math.min(24, Math.max(16, 30 - n/3)) + 'px';
+        content.appendChild(title);
+
+        const note = document.createElement('div');
+        note.textContent = 'Для неориентированного графа редактируйте только ячейки ВЫШЕ диагонали ';
+        note.style.backgroundColor = '#e8d7cf';
+        note.style.padding = '10px';
+        note.style.borderRadius = '8px';
+        note.style.marginBottom = '15px';
+        note.style.fontSize = '14px';
+        note.style.textAlign = 'center';
+        content.appendChild(note);
+
+        const tableContainer = document.createElement('div');
+        tableContainer.style.overflowX = 'auto';
+        tableContainer.style.flex = '1';
+        content.appendChild(tableContainer);
+
+        const distances = data.distances;
+
+        const table = document.createElement('table');
+        table.style.borderCollapse = 'collapse';
+        table.style.width = 'max-content';
+        table.style.fontSize = Math.min(13, Math.max(10, 15 - n/5)) + 'px';
+        table.style.margin = '0 auto';
+
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+
+        const cornerTh = document.createElement('th');
+        cornerTh.textContent = '';
+        cornerTh.style.border = '1px solid #e8d7cf';
+        cornerTh.style.padding = '12px 8px';
+        cornerTh.style.backgroundColor = '#e8d7cf';
+        cornerTh.style.width = '20px';
+        headerRow.appendChild(cornerTh);
+
+        for (let v of vertices) {
+            const th = document.createElement('th');
+            th.textContent = v;
+            th.style.border = '1px solid #e8d7cf';
+            th.style.padding = '12px 8px';
+            th.style.backgroundColor = '#e8d7cf';
+            th.style.fontWeight = 'bold';
+            th.style.textAlign = 'center';
+            th.style.minWidth = '25px';
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+        let pendingChanges = {};
+        const inputFields = [];
+
+        for (let i = 0; i < n; i++) {
+            const row = document.createElement('tr');
+            inputFields[i] = [];
+
+            const rowTh = document.createElement('th');
+            rowTh.textContent = vertices[i];
+            rowTh.style.border = '1px solid #e8d7cf';
+            rowTh.style.padding = '12px 8px';
+            rowTh.style.backgroundColor = '#e8d7cf';
+            rowTh.style.fontWeight = 'bold';
+            rowTh.style.textAlign = 'center';
+            rowTh.style.width = '30px';
+            row.appendChild(rowTh);
+
+            for (let j = 0; j < n; j++) {
+                const cell = document.createElement('td');
+                cell.style.border = '1px solid #e8d7cf';
+                cell.style.padding = '8px';
+                cell.style.textAlign = 'center';
+                cell.style.width = '150px';
+
+
+                const inputField = document.createElement('input');
+                inputField.type = 'number';
+                inputField.min = "0";
+                inputField.step = "any";
+                inputField.style.width = '100%';
+                inputField.style.height = '40px';
+                inputField.style.textAlign = 'center';
+                inputField.style.borderRadius = '4px';
+                inputField.style.boxSizing = 'border-box';
+                inputField.style.fontSize = 'inherit';
+
+                if (i === j) {
+                    inputField.value = 0;
+                    inputField.disabled = true;
+                    inputField.style.backgroundColor = '#f5f5f5';
+                    inputField.style.color = '#666';
+                    cell.style.backgroundColor = '#f5f5f5';
+                } else if (i < j) {
+                    const val = distances[i][j];
+                    if (typeof val === 'number' && !isNaN(val) && val !== Infinity && val !== null) {
+                        inputField.value = parseFloat(val).toFixed(2);
+                    } else {
+                        inputField.value = '';
+                        inputField.placeholder = '∞';
+                    }
+                    inputField.style.backgroundColor = '#e8f5e9';
+                    inputField.style.border = '1px solid #5a4d5e';
+
+                    inputField.onchange = function() {
+                        let newValueRaw = this.value.trim();
+                        let newValue;
+
+                        if (newValueRaw === '' || newValueRaw === '-' || newValueRaw.toLowerCase() === 'inf' || newValueRaw === '∞') {
+                            newValue = Infinity;
+                        } else {
+                            newValue = parseFloat(newValueRaw);
+                            if (isNaN(newValue) || newValue <= 0 || newValue > 1000000) {
+                                alert('Пожалуйста, введите корректное неотрицательное число и меньше 1000000.');
+                                const oldVal = distances[i][j];
+                                if (oldVal !== null && oldVal !== Infinity && !isNaN(oldVal)) {
+                                    this.value = parseFloat(oldVal).toFixed(2);
+                                } else {
+                                    this.value = '';
+                                }
+                                return;
+                            }
+                        }
+
+                        const key1 = `${vertices[i]}-${vertices[j]}`;
+                        const key2 = `${vertices[j]}-${vertices[i]}`;
+                        pendingChanges[key1] = newValue;
+                        pendingChanges[key2] = newValue;
+
+                        if (newValue === Infinity) {
+                            this.value = '';
+                            this.placeholder = '∞';
+                        } else {
+                            this.value = parseFloat(newValue).toFixed(2);
+                        }
+
+                        if (inputFields[j] && inputFields[j][i]) {
+                            const symmetricField = inputFields[j][i];
+                            if (newValue === Infinity) {
+                                symmetricField.value = '';
+                                symmetricField.placeholder = '∞';
+                            } else {
+                                symmetricField.value = parseFloat(newValue).toFixed(2);
+                            }
+                        }
+                    };
+                } else {
+                    const symmetricVal = distances[j][i];
+                    if (typeof symmetricVal === 'number' && !isNaN(symmetricVal) && symmetricVal !== Infinity && symmetricVal !== null) {
+                        inputField.value = parseFloat(symmetricVal).toFixed(2);
+                    } else {
+                        inputField.value = '';
+                        inputField.placeholder = '∞';
+                    }
+                    inputField.disabled = true;
+                    inputField.style.backgroundColor = '#f5f5f5';
+                    inputField.style.color = '#666';
+                    inputField.style.border = '1px solid #ddd';
+                    cell.style.backgroundColor = '#fafafa';
+                }
+
+                inputFields[i][j] = inputField;
+                cell.appendChild(inputField);
+                row.appendChild(cell);
+            }
+            tbody.appendChild(row);
+        }
+
+        table.appendChild(tbody);
+        tableContainer.appendChild(table);
+
+        // Контейнер для кнопок
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.style.display = 'flex';
+        buttonsContainer.style.gap = '15px';
+        buttonsContainer.style.justifyContent = 'center';
+        buttonsContainer.style.marginTop = '25px';
+        buttonsContainer.style.flexWrap = 'wrap';
+
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Применить изменения';
+        applyBtn.style.padding = '10px 25px';
+        applyBtn.style.backgroundColor = '#5a4d5e';
+        applyBtn.style.color = '#fff';
+        applyBtn.style.borderRadius = '8px';
+        applyBtn.style.border = 'none';
+        applyBtn.style.cursor = 'pointer';
+        applyBtn.style.fontSize = '14px';
+        applyBtn.style.fontWeight = 'bold';
+        applyBtn.style.transition = 'all 0.2s';
+
+        applyBtn.onmouseenter = () => applyBtn.style.backgroundColor = '#4a3d4e';
+        applyBtn.onmouseleave = () => applyBtn.style.backgroundColor = '#5a4d5e';
+
+        applyBtn.onclick = async function() {
+            if (Object.keys(pendingChanges).length === 0) {
+                alert('Нет изменений для сохранения.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/graph/edge/distance/batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pendingChanges)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`Сохранено ${result.count} изменений!`);
+                    pendingChanges = {};
+
+                    const graphResponse = await fetch('/api/graph');
+                    const graphData = await graphResponse.json();
+                    if (graphData.edges && typeof window.redrawLines === 'function') {
+                        window.lineConnections = graphData.edges;
+                        redrawLines();
+                    }
+
+                    document.body.removeChild(modal);
+                    showMatrix();
+                } else {
+                    alert('Ошибка при сохранении изменений');
+                }
+
+            } catch (e) {
+                console.error("Ошибка сохранения:", e);
+                alert("Не удалось сохранить изменения. Проверьте консоль разработчика.");
+            }
+        };
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Закрыть';
+        closeBtn.style.padding = '10px 25px';
+        closeBtn.style.backgroundColor = '#6c757d';
+        closeBtn.style.color = 'white';
+        closeBtn.style.borderRadius = '8px';
+        closeBtn.style.border = 'none';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.fontSize = '14px';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.transition = 'all 0.2s';
+
+        closeBtn.onmouseenter = () => closeBtn.style.backgroundColor = '#5a6268';
+        closeBtn.onmouseleave = () => closeBtn.style.backgroundColor = '#6c757d';
+
+        closeBtn.onclick = () => document.body.removeChild(modal);
+
+        buttonsContainer.appendChild(applyBtn);
+        buttonsContainer.appendChild(closeBtn);
+        content.appendChild(buttonsContainer);
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Произошла ошибка при загрузке данных. Смотрите консоль (F12).');
+    }
+}
+
 
 // Показать результаты Флойда-Уоршелла
 async function showFloydWarshall() {
@@ -157,7 +540,7 @@ async function showFloydWarshall() {
         const data = await response.json();
 
         if (!data.vertices || data.vertices.length === 0) {
-            alert('No vertices in graph. Add some points first.');
+            alert('Нет вершин в графе. Добавьте несколько точек.');
             return;
         }
 
@@ -183,7 +566,7 @@ async function showFloydWarshall() {
         content.style.boxShadow = '0 10px 40px rgba(0,0,0,0.3)';
 
         const title = document.createElement('h2');
-        title.textContent = 'Floyd-Warshall Algorithm Results';
+        title.textContent = 'Результаты алгоритма Флойда–Уоршелла';
         title.style.textAlign = 'center';
         title.style.marginBottom = '20px';
         title.style.color = '#5a4d5e';
@@ -195,7 +578,7 @@ async function showFloydWarshall() {
         tabContainer.style.marginBottom = '20px';
 
         const distTab = document.createElement('button');
-        distTab.textContent = 'Distance Matrix';
+        distTab.textContent = 'Матрица расстояний';
         distTab.style.padding = '10px 20px';
         distTab.style.backgroundColor = '#5a4d5e';
         distTab.style.color = 'white';
@@ -205,7 +588,7 @@ async function showFloydWarshall() {
         distTab.style.fontWeight = 'bold';
 
         const pathTab = document.createElement('button');
-        pathTab.textContent = 'Path Matrix';
+        pathTab.textContent = 'Матрица путей';
         pathTab.style.padding = '10px 20px';
         pathTab.style.backgroundColor = '#e8d7cf';
         pathTab.style.color = '#5a4d5e';
@@ -238,7 +621,7 @@ async function showFloydWarshall() {
             const headerRow = document.createElement('tr');
 
             const cornerTh = document.createElement('th');
-            cornerTh.textContent = 'From\\To';
+            cornerTh.textContent = 'Из\\В';
             cornerTh.style.border = '1px solid #e8d7cf';
             cornerTh.style.padding = '10px';
             cornerTh.style.backgroundColor = '#e8d7cf';
@@ -309,13 +692,7 @@ async function showFloydWarshall() {
             legend.style.backgroundColor = '#f9f9f9';
             legend.style.borderRadius = '8px';
             legend.style.fontSize = '12px';
-            legend.innerHTML = `
-            <strong>Legend:</strong><br>
-            🟢 Green: Short distance (< 100)<br>
-            🟠 Orange: Medium distance (100-500)<br>
-            🔴 Red: Long distance (> 500)<br>
-            ∞: No path exists
-            `;
+            legend.innerHTML = '📊 <strong>Легенда:</strong> 🟢 Малые расстояния | 🟠 Средние расстояния | 🔴 Большие расстояния';
             tableContainer.appendChild(legend);
         }
 
@@ -337,7 +714,7 @@ async function showFloydWarshall() {
             const headerRow = document.createElement('tr');
 
             const cornerTh = document.createElement('th');
-            cornerTh.textContent = 'From\\To';
+            cornerTh.textContent = 'Из\\В';
             cornerTh.style.border = '1px solid #e8d7cf';
             cornerTh.style.padding = '10px';
             cornerTh.style.backgroundColor = '#e8d7cf';
@@ -382,7 +759,7 @@ async function showFloydWarshall() {
                         cell.textContent = '-';
                         cell.style.backgroundColor = '#f5f5f5';
                     } else if (dist === null || dist === Infinity || !path || path.length === 0) {
-                        cell.textContent = 'No path';
+                        cell.textContent = 'Нет пути';
                         cell.style.color = '#999';
                         cell.style.backgroundColor = '#f9f9f9';
                     } else {
@@ -391,9 +768,9 @@ async function showFloydWarshall() {
                         cell.style.color = '#1565c0';
                         cell.style.cursor = 'pointer';
                         cell.style.fontWeight = '500';
-                        cell.title = `Distance: ${dist.toFixed(2)}`;
+                        cell.title = `Расстояние: ${dist.toFixed(2)}`;
                         cell.onclick = () => {
-                            alert(`Shortest path from ${vertices[i]} to ${vertices[j]}:\n\n${path.join(' → ')}\n\nTotal distance: ${dist.toFixed(2)}`);
+                            alert(`Кратчайший путь из ${vertices[i]} в ${vertices[j]}:\n\n${path.join(' → ')}\n\nОбщее расстояние: ${dist.toFixed(2)}`);
                         };
                     }
                     row.appendChild(cell);
@@ -409,7 +786,7 @@ async function showFloydWarshall() {
             info.style.backgroundColor = '#e3f2fd';
             info.style.borderRadius = '8px';
             info.style.fontSize = '12px';
-            info.innerHTML = '💡 <strong>Tip:</strong> Click on any path to see detailed information.';
+            info.innerHTML = '💡 <strong>Совет:</strong> Нажмите на любой путь, чтобы увидеть детальную информацию.';
             tableContainer.appendChild(info);
         }
 
@@ -432,7 +809,7 @@ async function showFloydWarshall() {
         };
 
         const closeBtn = document.createElement('button');
-        closeBtn.textContent = 'Close';
+        closeBtn.textContent = 'Закрыть';
         closeBtn.style.marginTop = '20px';
         closeBtn.style.padding = '12px 20px';
         closeBtn.style.backgroundColor = '#5a4d5e';
@@ -451,13 +828,19 @@ async function showFloydWarshall() {
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Error computing shortest paths');
+        alert('Ошибка вычисления кратчайших путей');
     }
 }
 
-// Автоматический запуск инициализации при загрузке страницы
+// Инициализация при загрузке страницы (только для /floyd)
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initFloydEditor);
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.location.pathname === '/floyd') {
+            setTimeout(initFloydEditor, 100);
+        }
+    });
 } else {
-    initFloydEditor();
+    if (window.location.pathname === '/floyd') {
+        setTimeout(initFloydEditor, 100);
+    }
 }
