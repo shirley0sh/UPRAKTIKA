@@ -49,7 +49,7 @@ async function loadGraph() {
             }
 
             // Если точек было больше лимита, показываем предупреждение
-            if (vertexEntries.length > MAX_POINTS) {
+            if (vertexEntries.length >= MAX_POINTS) {
                 alert(`Only ${MAX_POINTS} points loaded (maximum limit).`);
             }
         }
