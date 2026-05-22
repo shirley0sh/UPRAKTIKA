@@ -2,6 +2,7 @@
 let isKruskalInitialized = false;
 
 // Функция генерации случайных расстояний для страницы Краскала
+// Функция генерации случайных расстояний для страницы Краскала
 async function generateRandomDistancesKruskal() {
     const minInput = document.getElementById('random-min');
     const maxInput = document.getElementById('random-max');
@@ -56,7 +57,7 @@ async function generateRandomDistancesKruskal() {
                 }
             }
 
-            alert(`Случайные расстояния присвоены ${data.count} ребру(ам)!`);
+            alert(`Случайные целочисленные расстояния присвоены ${data.count} ребру(ам)!`);
         }
 
     } catch (error) {
@@ -64,7 +65,6 @@ async function generateRandomDistancesKruskal() {
         alert('Ошибка генерации случайных расстояний');
     }
 }
-
 // Функция очистки графа для страницы Краскала
 async function clearGraphKruskal() {
     if (!confirm('Очистить все точки и линии?')) return;
