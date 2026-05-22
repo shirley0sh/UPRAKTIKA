@@ -17,6 +17,7 @@ dijkstra_graph = DijkstraGraph()
 def index():
     return template('index')
 
+
 @app.route('/floyd')
 def floyd_page():
     return template('floyd')
@@ -48,17 +49,7 @@ def send_static(filename):
 
 # ============ API ДЛЯ ГРАФА ============
 
-@app.route('/api/graph', method='GET')
-def get_graph():
-    try:
-        response.content_type = 'application/json'
-        return json.dumps(graph.to_dict())
-    except Exception as e:
-        print(f"ERROR in get_graph: {e}")
-        traceback.print_exc()
-        response.status = 500
-        response.content_type = 'application/json'
-        return json.dumps({'error': str(e)})
+
 
 @app.route('/api/graph/update', method='POST')
 def update_graph():
@@ -70,6 +61,18 @@ def update_graph():
         return json.dumps({'success': True})
     except Exception as e:
         print(f"ERROR in update_graph: {e}")
+        traceback.print_exc()
+        response.status = 500
+        response.content_type = 'application/json'
+        return json.dumps({'error': str(e)})
+
+@app.route('/api/graph', method='GET')
+def get_graph():
+    try:
+        response.content_type = 'application/json'
+        return json.dumps(graph.to_dict())
+    except Exception as e:
+        print(f"ERROR in get_graph: {e}")
         traceback.print_exc()
         response.status = 500
         response.content_type = 'application/json'
