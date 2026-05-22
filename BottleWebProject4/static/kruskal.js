@@ -2,7 +2,6 @@
 let isKruskalInitialized = false;
 
 // Функция генерации случайных расстояний для страницы Краскала
-// Функция генерации случайных расстояний для страницы Краскала
 async function generateRandomDistancesKruskal() {
     const minInput = document.getElementById('random-min');
     const maxInput = document.getElementById('random-max');
@@ -205,7 +204,6 @@ function displayKruskalResult(edges, totalWeight, vertexIds) {
 
 // Подсветка рёбер, входящих в MST
 function highlightKruskalEdges(mstEdges, vertexIds) {
-    // Создаём Set для быстрого поиска
     const mstSet = new Set();
     for (const edge of mstEdges) {
         const uId = vertexIds[edge.u - 1];
@@ -214,15 +212,16 @@ function highlightKruskalEdges(mstEdges, vertexIds) {
         mstSet.add(key);
     }
     
-    // Проходим по всем линиям и подсвечиваем нужные
     lines.forEach(line => {
         const key = `${Math.min(line.fromId, line.toId)}-${Math.max(line.fromId, line.toId)}`;
         if (mstSet.has(key)) {
-            line.element.setAttribute('stroke', '#27ae60');
-            line.element.setAttribute('stroke-width', '5');
+            // Кислотно-зелёный цвет для рёбер MST
+            line.element.setAttribute('stroke', '#39ff14');
+            line.element.setAttribute('stroke-width', '6');
             if (line.label) {
-                line.label.setAttribute('fill', '#27ae60');
+                line.label.setAttribute('fill', '#39ff14');
                 line.label.setAttribute('font-weight', 'bold');
+                line.label.setAttribute('font-size', '14');
             }
         } else {
             line.element.setAttribute('stroke', '#bdc2ce');
@@ -230,6 +229,7 @@ function highlightKruskalEdges(mstEdges, vertexIds) {
             if (line.label) {
                 line.label.setAttribute('fill', '#e74c3c');
                 line.label.setAttribute('font-weight', 'normal');
+                line.label.setAttribute('font-size', '12');
             }
         }
     });
