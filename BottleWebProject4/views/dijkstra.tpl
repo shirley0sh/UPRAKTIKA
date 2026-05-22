@@ -43,14 +43,44 @@
             justify-content: flex-start;
         }
 
+        .input-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .input-section-header h4 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .btn-random-fill {
+            background: rgba(187, 195, 208, 0.9);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
+        .btn-random-fill:hover {
+            background: #94899c;
+            transform: scale(0.97);
+        }
 
         .right-area {
-
             flex: 1.7;
             display: flex;
             flex-direction: column;
             gap: 20px;
             min-width: 480px;
+            transition: gap 0.3s ease;
         }
 
         .canvas {
@@ -60,6 +90,39 @@
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
             height: 460px;
+            transition: height 0.3s ease, min-height 0.3s ease, opacity 0.2s ease;
+        }
+
+        .canvas.collapsed {
+            height: 120px;
+            min-height: 120px;
+            opacity: 0.85;
+        }
+
+        .canvas.collapsed .points-layer {
+            pointer-events: none;
+        }
+
+        .canvas-toggle-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 30;
+            background: rgba(90, 77, 94, 0.9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .canvas-toggle-btn:hover {
+            background: #94899c;
+            transform: translateY(-1px);
         }
 
         .lines-layer {
@@ -79,6 +142,7 @@
             width: 100%;
             height: 100%;
             z-index: 10;
+            transition: transform 0.3s ease;
         }
 
         .graph-point {
@@ -128,6 +192,18 @@
             border-radius: 16px;
             display: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-top: 0;
+        }
+
+        .results-panel.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .results-panel.hidden-by-expand {
+            display: none !important;
         }
 
         .results-panel h4 {
@@ -387,6 +463,7 @@
             .container { flex-direction: column; }
             .right-area { min-width: auto; }
             .results-horizontal { flex-direction: column; }
+            .input-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
         }
     </style>
 </head>
@@ -402,7 +479,10 @@
         <h3>Алгоритм Дейкстры</h3>
 
         <div class="input-section">
-            <h4>Входные данные</h4>
+            <div class="input-section-header">
+                <h4>Входные данные</h4>
+                <button class="btn-random-fill" id="random-fill-btn">Заполнить рандомно</button>
+            </div>
             <div class="inline-group">
                 <label for="vertex-count">Количество вершин (2-8):</label>
                 <input type="number" id="vertex-count" min="2" max="8" value="4" class="small-number-input" />
@@ -429,6 +509,7 @@
     <!-- канвас + результаты -->
     <div class="right-area">
         <div id="canvas" class="canvas">
+            <button id="canvas-toggle-btn" class="canvas-toggle-btn" title="Развернуть/свернуть канвас">⤢ Канвас</button>
             <svg id="lines-layer" class="lines-layer"></svg>
             <div id="points-layer" class="points-layer"></div>
         </div>
@@ -456,3 +537,4 @@
 <script src="/static/dijkstra.js"></script>
 </body>
 </html>
+

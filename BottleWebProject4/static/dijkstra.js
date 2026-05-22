@@ -6,6 +6,8 @@ let currentN = 4;
 let syncingFromMatrix = false;
 let syncingFromCanvas = false;
 let nextVertexId = 1;
+let isCanvasCollapsed = false;
+let originalCanvasHeight = 460;
 
 const canvasDiv = document.getElementById('canvas');
 const linesSvg = document.getElementById('lines-layer');
@@ -13,6 +15,50 @@ const pointsLayer = document.getElementById('points-layer');
 const matrixContainer = document.getElementById('matrix-container');
 const weightMatrixTable = document.getElementById('weight-matrix');
 const resultsPanel = document.getElementById('results-panel');
+const canvasToggleBtn = document.getElementById('canvas-toggle-btn');
+
+// Функция переключения состояния канваса
+function toggleCanvas() {
+    if (!canvasDiv) return;
+
+    if (isCanvasCollapsed) {
+        canvasDiv.style.height = originalCanvasHeight + 'px';
+        canvasDiv.classList.remove('collapsed');
+        canvasToggleBtn.textContent = '⤢ Свернуть';
+
+        if (resultsPanel) {
+            resultsPanel.classList.add('hidden-by-expand');
+        }
+
+        isCanvasCollapsed = false;
+    } else {
+        if (!originalCanvasHeight || originalCanvasHeight === 120) {
+            const rect = canvasDiv.getBoundingClientRect();
+            originalCanvasHeight = rect.height || 460;
+        }
+
+        canvasDiv.classList.add('collapsed');
+        canvasToggleBtn.textContent = '⤡ Развернуть';
+
+        if (resultsPanel && resultsPanel.style.display === 'block') {
+            resultsPanel.classList.remove('hidden-by-expand');
+            resultsPanel.classList.add('visible');
+        }
+
+        isCanvasCollapsed = true;
+    }
+
+    setTimeout(() => {
+        redrawLinesAndLabels();
+    }, 300);
+}
+
+function saveOriginalCanvasHeight() {
+    if (canvasDiv && !isCanvasCollapsed) {
+        const rect = canvasDiv.getBoundingClientRect();
+        originalCanvasHeight = rect.height || 460;
+    }
+}
 
 function redrawLinesAndLabels() {
     if (!linesSvg || !canvasDiv) return;
@@ -104,7 +150,6 @@ function updateGraphFromMatrix() {
     if (resultsPanel) resultsPanel.style.display = 'none';
     syncingFromMatrix = false;
 
-    // Синхронизируем с сервером после изменения графа
     syncGraphToServer();
 }
 
@@ -115,6 +160,9 @@ function createVerticesOnCanvas(n) {
     const rect = canvasDiv.getBoundingClientRect();
     const w = rect.width || 800;
     const h = rect.height || 460;
+    if (!isCanvasCollapsed) {
+        originalCanvasHeight = h;
+    }
     const centerX = w / 2;
     const centerY = h / 2;
     const radius = Math.min(w, h) * 0.32;
@@ -124,7 +172,7 @@ function createVerticesOnCanvas(n) {
         const angle = angleStep * (idx - 1) - Math.PI / 2;
         const x = centerX + radius * Math.cos(angle);
         const y = centerY + radius * Math.sin(angle);
-        const pointId = idx; // Используем label как id для простоты
+        const pointId = idx;
         const pointDiv = document.createElement('div');
         pointDiv.className = 'graph-point';
         pointDiv.textContent = idx;
@@ -209,6 +257,7 @@ function buildMatrixTable(n) {
             const input = document.createElement('input');
             input.type = 'number';
             input.min = '0';
+            input.step = '0.01';
             input.value = '0';
             input.setAttribute('data-row', i);
             input.setAttribute('data-col', j);
@@ -237,13 +286,78 @@ function buildMatrixTable(n) {
     weightMatrixTable.appendChild(tbody);
 }
 
+// Функция рандомного заполнения графа и матрицы
+function fillRandomGraph() {
+    const randomN = Math.floor(Math.random() * 7) + 2;
+
+    const nInput = document.getElementById('vertex-count');
+    if (nInput) nInput.value = randomN;
+
+    currentN = randomN;
+    if (resultsPanel) {
+        resultsPanel.style.display = 'none';
+        resultsPanel.classList.remove('visible', 'hidden-by-expand');
+    }
+    if (canvasDiv) {
+        canvasDiv.classList.remove('collapsed');
+        canvasDiv.style.height = '';
+        isCanvasCollapsed = false;
+        if (canvasToggleBtn) {
+            canvasToggleBtn.textContent = '⤢ Свернуть';
+            canvasToggleBtn.style.display = 'none';
+        }
+        saveOriginalCanvasHeight();
+    }
+    matrixContainer.style.display = 'block';
+    buildMatrixTable(currentN);
+    createVerticesOnCanvas(currentN);
+
+    for (let i = 1; i <= currentN; i++) {
+        for (let j = i + 1; j <= currentN; j++) {
+            const input = document.querySelector(`input[data-row='${i}'][data-col='${j}']`);
+            if (!input) continue;
+
+            let weight;
+            if (Math.random() < 0.3) {
+                weight = 0;
+            } else {
+                weight = Math.round((Math.random() * 150) * 100) / 100;
+            }
+
+            input.value = weight;
+
+            const symmetric = document.querySelector(`input[data-row='${j}'][data-col='${i}']`);
+            if (symmetric) symmetric.value = weight;
+        }
+    }
+
+    updateGraphFromMatrix();
+    updateStartVertexSelect(currentN);
+
+    const errDiv = document.getElementById('error-message');
+    if (errDiv) errDiv.style.display = 'none';
+}
+
 function initGraphAndMatrix() {
     const nInput = document.getElementById('vertex-count');
     let n = parseInt(nInput.value);
     if (isNaN(n) || n < 2) n = 2;
     if (n > 8) n = 8;
     currentN = n;
-    if (resultsPanel) resultsPanel.style.display = 'none';
+    if (resultsPanel) {
+        resultsPanel.style.display = 'none';
+        resultsPanel.classList.remove('visible', 'hidden-by-expand');
+    }
+    if (canvasDiv) {
+        canvasDiv.classList.remove('collapsed');
+        canvasDiv.style.height = '';
+        isCanvasCollapsed = false;
+        if (canvasToggleBtn) {
+            canvasToggleBtn.textContent = '⤢ Свернуть';
+            canvasToggleBtn.style.display = 'none';
+        }
+        saveOriginalCanvasHeight();
+    }
     matrixContainer.style.display = 'block';
     buildMatrixTable(currentN);
     createVerticesOnCanvas(currentN);
@@ -301,9 +415,7 @@ function getWeightMatrixFromDOM() {
     return mat;
 }
 
-// Синхронизация графа с сервером
 async function syncGraphToServer() {
-    // Строим данные для отправки на сервер в формате, который ожидает graph.from_dict()
     const vertices = {};
     for (let v of verticesData) {
         vertices[v.id] = {
@@ -339,7 +451,6 @@ async function syncGraphToServer() {
     }
 }
 
-// Вызов алгоритма Дейкстры на сервере
 async function runDijkstra(start) {
     const response = await fetch('/api/dijkstra/calculate', {
         method: 'POST',
@@ -361,7 +472,6 @@ async function runDijkstra(start) {
     return data;
 }
 
-// Отображение результатов
 function displayResults(start, responseData) {
     if (!resultsPanel) return;
 
@@ -378,6 +488,10 @@ function displayResults(start, responseData) {
     pathDiv.innerHTML = '';
 
     for (let item of results) {
+        if (item.vertex === start) {
+            continue;
+        }
+
         const row = document.createElement('tr');
         const tdV = document.createElement('td');
         const tdD = document.createElement('td');
@@ -396,9 +510,7 @@ function displayResults(start, responseData) {
         const pathItem = document.createElement('div');
         pathItem.className = 'path-item';
 
-        if (item.vertex === start) {
-            pathItem.textContent = `Путь до вершины ${item.vertex}: ${item.vertex} (стартовая), длина = 0`;
-        } else if (item.distance === null || item.distance === Infinity || item.distance === undefined) {
+        if (item.distance === null || item.distance === Infinity || item.distance === undefined) {
             pathItem.innerHTML = `<span class="unreachable">Вершина ${item.vertex} недостижима из стартовой ${start}</span>`;
         } else {
             const path = item.path || [];
@@ -408,12 +520,41 @@ function displayResults(start, responseData) {
         pathDiv.appendChild(pathItem);
     }
 
+    saveOriginalCanvasHeight();
+
     resultsPanel.style.display = 'block';
+    setTimeout(() => {
+        resultsPanel.classList.add('visible');
+        resultsPanel.classList.remove('hidden-by-expand');
+    }, 10);
+
+    if (canvasDiv && !isCanvasCollapsed) {
+        isCanvasCollapsed = true;
+        canvasDiv.classList.add('collapsed');
+        if (canvasToggleBtn) {
+            canvasToggleBtn.textContent = '⤡ Развернуть';
+            canvasToggleBtn.style.display = 'block';
+        }
+        setTimeout(() => {
+            redrawLinesAndLabels();
+        }, 300);
+    }
+
+    if (canvasToggleBtn) {
+        canvasToggleBtn.style.display = 'block';
+    }
 }
+
+
 
 // Обработчики событий
 document.getElementById('generate-matrix-btn').addEventListener('click', () => {
     initGraphAndMatrix();
+});
+
+// Обработчик кнопки "Заполнить рандомно"
+document.getElementById('random-fill-btn').addEventListener('click', () => {
+    fillRandomGraph();
 });
 
 document.getElementById('calculate-btn').addEventListener('click', async () => {
@@ -423,9 +564,7 @@ document.getElementById('calculate-btn').addEventListener('click', async () => {
     if (!startVal) { showError('Выберите стартовую вершину'); return; }
 
     try {
-        // Сначала синхронизируем текущий граф с сервером
         await syncGraphToServer();
-        // Затем вызываем алгоритм
         const result = await runDijkstra(startVal);
         displayResults(startVal, result);
     } catch (error) {
@@ -434,8 +573,13 @@ document.getElementById('calculate-btn').addEventListener('click', async () => {
     }
 });
 
+if (canvasToggleBtn) {
+    canvasToggleBtn.addEventListener('click', toggleCanvas);
+}
+
 window.addEventListener('resize', () => {
-    if (verticesData.length === currentN) {
+    if (verticesData.length === currentN && !isCanvasCollapsed) {
+        saveOriginalCanvasHeight();
         redrawLinesAndLabels();
     }
 });
