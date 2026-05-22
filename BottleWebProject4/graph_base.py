@@ -3,8 +3,6 @@ import math
 from typing import Dict, List, Tuple, Optional
 
 class BaseGraph:
-    """Базовый класс для графа"""
-
     def __init__(self):
         self.adjacency: Dict[int, Dict[int, float]] = {}
         self.points: Dict[int, Dict[str, float]] = {}
@@ -72,13 +70,27 @@ class BaseGraph:
             return True
         return False
 
-    def set_edge_distance(self, v1: int, v2: int, distance: float) -> bool:
-        """Установка расстояния на ребре"""
+    def set_edge_distance(self, v1, v2, distance):
+        """
+        Устанавливает вес ребра. Если ребра нет и вес не бесконечность, создает его.
+        """
+        # Если это петля (v1 == v2), игнорируем
+        if v1 == v2:
+            return False
+
+        # Если вес Infinity, мы хотим удалить ребро, если оно есть
+        if distance == float('inf'):
+            return self.remove_edge(v1, v2)
+
+        # Пробуем обновить существующий вес
         if v1 in self.adjacency and v2 in self.adjacency[v1]:
             self.adjacency[v1][v2] = distance
-            self.adjacency[v2][v1] = distance
             return True
-        return False
+
+        # Если ребра не было и вес - число, создаем новое ребро
+        else:
+            # Используем существующий метод add_edge
+            return self.add_edge(v1, v2, distance)
 
     def get_edge_distance(self, v1: int, v2: int) -> Optional[float]:
         """Получение расстояния между вершинами"""

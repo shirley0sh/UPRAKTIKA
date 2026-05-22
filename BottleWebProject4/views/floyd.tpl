@@ -43,6 +43,9 @@
             background: rgba(255, 255, 255, 0.3);
             transform: translateX(-2px);
         }
+        .info-panel .s-s {
+            font-size: 16px !important;
+        }
 
         /* Стиль для заголовка-ссылки на теорию */
         .floyd-title-link {
@@ -101,11 +104,32 @@
 
         .drag-hint {
             text-align: center;
-            font-size: 13px;
+            font-size: 20px;
             color: rgba(255, 255, 255, 0.7);
             margin-top: -5px;
             margin-bottom: 10px;
         }
+        /* Для заголовков */
+        .s-s.h4 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Для обычного текста */
+        .s-s.p {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Базовый стиль (без размера шрифта) */
+        .s-s {
+            text-align: left;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: -5px;
+            margin-bottom: 10px;
+        }
+
+
 
         /* Панель генерации случайных расстояний */
         .random-panel {
@@ -207,7 +231,7 @@
         }
 
         .btn-danger:hover {
-            background: #6e5d73;
+            background: #C52C2C;
         }
 
         /* Информационный блок */
@@ -257,12 +281,12 @@
             <!-- Создание вершины -->
             <div class="vertex-creator">
                 <div id="point-drag" class="draggable-point" draggable="true" title="Перетащите на холст">+</div>
-                <div class="drag-hint">📌 Перетащите на холст</div>
+                <div class="drag-hint">Перетащите на холст</div>
             </div>
 
             <!-- Генерация случайных расстояний -->
             <div class="random-panel">
-                <div class="random-title">🎲 Случайные веса рёбер</div>
+                <div class="random-title">Случайные веса рёбер</div>
                 <div class="input-row">
                     <div class="input-group">
                         <label>Мин.</label>
@@ -278,16 +302,17 @@
 
             <!-- Кнопки действий -->
             <div class="action-buttons">
-                <button id="floyd-btn" class="btn btn-primary">🔍 Вычислить кратчайшие пути</button>
-                <button id="clear-graph-btn" class="btn btn-danger">🗑 Очистить граф</button>
+                <button id="floyd-matrix" class="btn btn-primary">Задать длину путей</button>
+                <button id="floyd-btn" class="btn btn-primary">Вычислить кратчайшие пути</button>
+                <button id="clear-graph-btn" class="btn btn-danger">Очистить граф</button>
             </div>
 
             <!-- Информационный блок -->
             <div class="info-panel">
-                <h4>ℹ️ О алгоритме</h4>
-                <p>Флойда–Уоршелла находит кратчайшие пути между всеми парами вершин.</p>
-                <p><strong>Сложность:</strong> O(n³)</p>
-                <p><span class="shortcut">💡 Совет:</span> Дважды кликните по ребру, чтобы задать вес</p>
+                <h4 class="s-s">О алгоритме</h4>
+                <p class="s-s">Флойда–Уоршелла находит кратчайшие пути между всеми парами вершин.</p>
+                <p class="s-s"><strong>Сложность:</strong> O(n³)</p>
+                <p class="s-s"><span class="shortcut">Совет:</span> Дважды кликните по ребру, чтобы задать вес или воспользуйтесь кнопкой задать длину. Двойной клик по точке удаляет её. 0<Значение<=1000000</p>
             </div>
         </div>
 

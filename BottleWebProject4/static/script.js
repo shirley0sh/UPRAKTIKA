@@ -1,4 +1,8 @@
 ﻿// Глобальные переменные
+const MAX_POINTS = 10;
+const MIN_DISTANCE = 0.0001; // строго больше 0
+const MAX_DISTANCE = 1000000; // меньше или равно миллиону
+
 let points = [];
 let lines = [];
 let selectedPointId = null;
@@ -28,17 +32,25 @@ async function loadGraph() {
                 point.element.remove();
             }
         });
-
         points = [];
 
         if (data.vertices) {
-            for (const [id, point] of Object.entries(data.vertices)) {
+            const vertexEntries = Object.entries(data.vertices);
+            // Берём только первые 15 точек
+            const limitedVertices = vertexEntries.slice(0, MAX_POINTS);
+
+            for (const [id, point] of limitedVertices) {
                 points.push({
                     id: parseInt(id),
                             x: point.x,
                             y: point.y,
                             element: null
                 });
+            }
+
+            // Если точек было больше лимита, показываем предупреждение
+            if (vertexEntries.length > MAX_POINTS) {
+                alert(`Only ${MAX_POINTS} points loaded (maximum limit).`);
             }
         }
 
@@ -50,11 +62,11 @@ async function loadGraph() {
 
         redrawAll();
         updateVertexSelect();
-
     } catch (error) {
         console.error('Error loading graph:', error);
     }
 }
+
 
 // Сохранение графа
 async function saveGraph() {
@@ -237,8 +249,23 @@ async function editLineDistance(v1, v2) {
     const currentDist = conn && conn.distance ? conn.distance : 0;
     const newDist = prompt('Enter distance:', currentDist > 0 ? currentDist : '');
 
-    if (newDist && !isNaN(parseFloat(newDist)) && parseFloat(newDist) > 0) {
+    if (newDist) {
         const dist = parseFloat(newDist);
+
+        if (isNaN(dist)) {
+            alert('Please enter a valid number');
+            return;
+        }
+
+        if (dist <= MIN_DISTANCE) {
+            alert(`Distance must be greater than ${MIN_DISTANCE}`);
+            return;
+        }
+
+        if (dist > MAX_DISTANCE) {
+            alert(`Длина не должна превышать ${MAX_DISTANCE}`);
+            return;
+        }
 
         try {
             await fetch('/api/graph/edge/distance', {
@@ -253,12 +280,12 @@ async function editLineDistance(v1, v2) {
 
             redrawLines();
             saveGraph();
-
         } catch (error) {
-            console.error('Error setting distance:', error);
+            console.error('Ошибка установки длины:', error);
         }
     }
 }
+
 
 // Выделение линии
 function selectLine(lineElement, fromId, toId) {
@@ -300,12 +327,17 @@ async function deleteSelectedLine() {
         saveGraph();
 
     } catch (error) {
-        console.error('Error deleting line:', error);
+        console.error('Ошибка удаления линии:', error);
     }
 }
 
 // Добавление новой точки
 async function addPoint(x, y) {
+    if (points.length >= MAX_POINTS) {
+        alert('Достигнут лимит количества точек (10)');
+        return;
+    }
+
     try {
         const response = await fetch('/api/graph/vertex', {
             method: 'POST',
@@ -328,11 +360,11 @@ async function addPoint(x, y) {
             saveGraph();
             updateVertexSelect();
         }
-
     } catch (error) {
-        console.error('Error adding point:', error);
+        console.error('Ошибка добавления точки:', error);
     }
 }
+
 
 // Удаление точки
 async function removePoint(id) {
@@ -356,7 +388,7 @@ async function removePoint(id) {
         updateVertexSelect();
 
     } catch (error) {
-        console.error('Error removing point:', error);
+        console.error('Ошибка удаления точки:', error);
     }
 }
 
@@ -368,20 +400,27 @@ async function generateRandomDistances() {
     let min = parseInt(minInput.value);
     let max = parseInt(maxInput.value);
 
+    // Проверка на корректность ввода
     if (isNaN(min)) {
-        alert('Please enter a valid minimum value');
+        alert('Пожалуйста введите коректный минмимум');
         return;
     }
     if (isNaN(max)) {
-        alert('Please enter a valid maximum value');
+        alert('Пожалуйста введите коректный максимум');
+        return;
+    }
+
+    // Проверка диапазона расстояний
+    if (min <= MIN_DISTANCE) {
+        alert(`Минимальная длина должна быть больше ${MIN_DISTANCE}`);
+        return;
+    }
+    if (max > MAX_DISTANCE) {
+        alert(`Максимальная длина не может превышать ${MAX_DISTANCE}`);
         return;
     }
     if (min >= max) {
-        alert('Minimum must be less than maximum');
-        return;
-    }
-    if (min < 0 || max < 0) {
-        alert('Values cannot be negative');
+        alert('Минимум должен быть меньше максимума');
         return;
     }
 
@@ -405,12 +444,12 @@ async function generateRandomDistances() {
 
             alert(`Random distances assigned to ${data.count} line(s)!`);
         }
-
     } catch (error) {
         console.error('Error generating random distances:', error);
         alert('Error generating random distances');
     }
 }
+
 
 // Очистка графа для главной страницы
 async function clearGraph() {

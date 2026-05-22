@@ -11,6 +11,49 @@ class FloydWarshallGraph(BaseGraph):
         self._paths = None
         self._vertices = None
 
+    def get_vertices(self) -> Dict[int, Dict[str, float]]:
+        """Возвращает словарь всех вершин"""
+        return self.points.copy()
+
+    def get_edge_distance(self, v1: int, v2: int) -> Optional[float]:
+        """Получение расстояния между вершинами"""
+        if v1 in self.adjacency and v2 in self.adjacency[v1]:
+            return self.adjacency[v1][v2]
+        return None
+
+    def set_edge_distance(self, v1: int, v2: int, distance: float) -> bool:
+        """Устанавливает расстояние между вершинами"""
+        # Если это петля, игнорируем
+        if v1 == v2:
+            return False
+
+        # Если вес бесконечность, удаляем ребро
+        if distance == float('inf'):
+            return self.remove_edge(v1, v2)
+
+        # Проверяем, существуют ли вершины
+        if v1 not in self.adjacency:
+            self.adjacency[v1] = {}
+        if v2 not in self.adjacency:
+            self.adjacency[v2] = {}
+
+        # Устанавливаем расстояние
+        self.adjacency[v1][v2] = distance
+        self.adjacency[v2][v1] = distance
+        return True
+
+    def get_edges(self) -> List[Dict]:
+        """Возвращает список всех ребер"""
+        edges = []
+        seen = set()
+        for v1 in self.adjacency:
+            for v2, dist in self.adjacency[v1].items():
+                key = tuple(sorted([v1, v2]))
+                if key not in seen:
+                    seen.add(key)
+                    edges.append({'from': v1, 'to': v2, 'distance': dist})
+        return edges
+
     def floyd_warshall(self) -> Dict:
         """Алгоритм Флойда-Уоршелла для поиска кратчайших путей"""
         vertices = sorted(self.get_all_vertices())
